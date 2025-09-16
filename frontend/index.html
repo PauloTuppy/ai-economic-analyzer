@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-color-scheme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced AI Economic Advisor</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">🤖</span>
+                <span class="logo-text">AI Economic Advisor</span>
+                <span class="version">v2.0</span>
+            </div>
+            <nav class="nav">
+                <button class="nav-item active" data-page="dashboard">📊 Dashboard</button>
+                <button class="nav-item" data-page="portfolio">💼 Portfólio</button>
+                <button class="nav-item" data-page="economic">🌍 Economia</button>
+                <button class="nav-item" data-page="risk">⚠️ Risco</button>
+                <button class="nav-item" data-page="chat">🤖 AI Chat</button>
+            </nav>
+            <div class="header-controls">
+                <button id="themeToggle" class="theme-toggle">🌙</button>
+                <div class="connection-status" id="connectionStatus">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Conectando...</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page active">
+            <div class="page-header">
+                <h1>Dashboard Executivo</h1>
+                <div class="page-actions">
+                    <button class="btn btn-primary" onclick="economicAdvisor.refreshData()">
+                        🔄 Atualizar Dados
+                    </button>
+                    <button class="btn btn-secondary" onclick="economicAdvisor.exportReport()">
+                        📊 Exportar Relatório
+                    </button>
+                </div>
+            </div>
+
+            <!-- Key Metrics Cards -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <h3>Valor Total do Portfólio</h3>
+                        <span class="metric-icon">💰</span>
+                    </div>
+                    <div class="metric-value" id="totalValue">R$ 300.910,60</div>
+                    <div class="metric-change positive" id="totalChange">+18,87%</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <h3>Retorno Anual</h3>
+                        <span class="metric-icon">📈</span>
+                    </div>
+                    <div class="metric-value" id="annualReturn">+18,87%</div>
+                    <div class="metric-change positive">vs IBOV: +12,3%</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <h3>Sharpe Ratio</h3>
+                        <span class="metric-icon">⚖️</span>
+                    </div>
+                    <div class="metric-value" id="sharpeRatio">0,87</div>
+                    <div class="metric-change neutral">Risco Ajustado</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <h3>VaR (95%)</h3>
+                        <span class="metric-icon">⚠️</span>
+                    </div>
+                    <div class="metric-value" id="varValue">-2,3%</div>
+                    <div class="metric-change neutral">Risco Diário</div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Performance do Portfólio</h3>
+                        <div class="chart-controls">
+                            <button class="chart-period active" data-period="1M">1M</button>
+                            <button class="chart-period" data-period="3M">3M</button>
+                            <button class="chart-period" data-period="6M">6M</button>
+                            <button class="chart-period" data-period="1Y">1A</button>
+                        </div>
+                    </div>
+                    <canvas id="portfolioChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Alocação de Ativos</h3>
+                    </div>
+                    <canvas id="allocationChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Market Overview -->
+            <div class="market-overview">
+                <h3>Visão Geral do Mercado</h3>
+                <div class="market-grid">
+                    <div class="market-item">
+                        <span class="market-label">IBOVESPA</span>
+                        <span class="market-value" id="ibovValue">118.000</span>
+                        <span class="market-change positive" id="ibovChange">+0,8%</span>
+                    </div>
+                    <div class="market-item">
+                        <span class="market-label">S&P 500</span>
+                        <span class="market-value" id="sp500Value">4.500</span>
+                        <span class="market-change positive" id="sp500Change">+0,5%</span>
+                    </div>
+                    <div class="market-item">
+                        <span class="market-label">USD/BRL</span>
+                        <span class="market-value" id="usdBrlValue">5,20</span>
+                        <span class="market-change negative" id="usdBrlChange">-0,3%</span>
+                    </div>
+                    <div class="market-item">
+                        <span class="market-label">SELIC</span>
+                        <span class="market-value" id="selicValue">11,75%</span>
+                        <span class="market-change neutral">Estável</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Page -->
+        <div id="portfolio" class="page">
+            <div class="page-header">
+                <h1>Gestão de Portfólio</h1>
+                <div class="page-actions">
+                    <button class="btn btn-primary" onclick="economicAdvisor.optimizePortfolio()">
+                        🎯 Otimizar Portfólio
+                    </button>
+                    <button class="btn btn-secondary" onclick="economicAdvisor.rebalancePortfolio()">
+                        ⚖️ Rebalancear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Holdings Table -->
+            <div class="holdings-section">
+                <h3>Posições Atuais</h3>
+                <div class="table-container">
+                    <table class="holdings-table" id="holdingsTable">
+                        <thead>
+                            <tr>
+                                <th>Ativo</th>
+                                <th>Quantidade</th>
+                                <th>Preço Atual</th>
+                                <th>Valor Total</th>
+                                <th>Retorno</th>
+                                <th>% Portfólio</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dados preenchidos via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Portfolio Optimizer -->
+            <div class="optimizer-section">
+                <h3>Otimizador de Portfólio</h3>
+                <div class="optimizer-controls">
+                    <div class="control-group">
+                        <label for="riskTolerance">Tolerância ao Risco</label>
+                        <input type="range" id="riskTolerance" min="1" max="10" value="5">
+                        <span id="riskValue">5</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="investmentHorizon">Horizonte de Investimento</label>
+                        <select id="investmentHorizon">
+                            <option value="short">Curto Prazo (< 1 ano)</option>
+                            <option value="medium" selected>Médio Prazo (1-5 anos)</option>
+                            <option value="long">Longo Prazo (> 5 anos)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="optimizationGoal">Objetivo</label>
+                        <select id="optimizationGoal">
+                            <option value="return">Maximizar Retorno</option>
+                            <option value="risk" selected>Minimizar Risco</option>
+                            <option value="sharpe">Maximizar Sharpe</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Economic Analysis Page -->
+        <div id="economic" class="page">
+            <div class="page-header">
+                <h1>Análise Econômica Global</h1>
+                <div class="page-actions">
+                    <button class="btn btn-primary" onclick="economicAdvisor.refreshEconomicData()">
+                        🔄 Atualizar Indicadores
+                    </button>
+                </div>
+            </div>
+
+            <!-- Economic Indicators -->
+            <div class="economic-indicators">
+                <div class="indicator-section">
+                    <h3>🇧🇷 Brasil</h3>
+                    <div class="indicators-grid">
+                        <div class="indicator-card">
+                            <div class="indicator-label">Taxa SELIC</div>
+                            <div class="indicator-value">11,75%</div>
+                            <div class="indicator-trend neutral">Estável</div>
+                        </div>
+                        <div class="indicator-card">
+                            <div class="indicator-label">IPCA (12m)</div>
+                            <div class="indicator-value">4,2%</div>
+                            <div class="indicator-trend positive">↓ Desacelerando</div>
+                        </div>
+                        <div class="indicator-card">
+                            <div class="indicator-label">PIB</div>
+                            <div class="indicator-value">2,8%</div>
+                            <div class="indicator-trend positive">↑ Crescimento</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="indicator-section">
+                    <h3>🇺🇸 Estados Unidos</h3>
+                    <div class="indicators-grid">
+                        <div class="indicator-card">
+                            <div class="indicator-label">Fed Rate</div>
+                            <div class="indicator-value">5,25%</div>
+                            <div class="indicator-trend neutral">Estável</div>
+                        </div>
+                        <div class="indicator-card">
+                            <div class="indicator-label">CPI (12m)</div>
+                            <div class="indicator-value">3,1%</div>
+                            <div class="indicator-trend positive">↓ Desacelerando</div>
+                        </div>
+                        <div class="indicator-card">
+                            <div class="indicator-label">PIB</div>
+                            <div class="indicator-value">2,1%</div>
+                            <div class="indicator-trend neutral">Moderado</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Assessment Page -->
+        <div id="risk" class="page">
+            <div class="page-header">
+                <h1>Avaliação de Risco</h1>
+            </div>
+
+            <!-- Risk Metrics -->
+            <div class="risk-metrics">
+                <div class="risk-card">
+                    <h3>Value at Risk (VaR)</h3>
+                    <div class="risk-values">
+                        <div class="risk-item">
+                            <span class="risk-label">VaR 95%</span>
+                            <span class="risk-value">-2,3%</span>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-label">VaR 99%</span>
+                            <span class="risk-value">-4,1%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="risk-card">
+                    <h3>Métricas de Risco</h3>
+                    <div class="risk-values">
+                        <div class="risk-item">
+                            <span class="risk-label">Beta</span>
+                            <span class="risk-value">1,15</span>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-label">Volatilidade</span>
+                            <span class="risk-value">18,5%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Chat Page -->
+        <div id="chat" class="page">
+            <div class="page-header">
+                <h1>Consultor AI</h1>
+                <div class="ai-status">
+                    <span class="ai-indicator active"></span>
+                    <span>Gemini 2.5 Pro Ativo</span>
+                </div>
+            </div>
+
+            <div class="chat-container">
+                <div class="chat-messages" id="chatContainer">
+                    <div class="chat-message ai">
+                        <div class="message-content">
+                            <div class="message-text">
+                                Olá! Sou seu consultor financeiro AI. Posso ajudar com análise de portfólio, 
+                                recomendações de investimento, avaliação de riscos e estratégias econômicas. 
+                                Como posso ajudá-lo hoje?
+                            </div>
+                            <div class="message-time">Agora</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <div class="quick-questions">
+                        <button class="quick-btn" onclick="economicAdvisor.askQuickQuestion('Como otimizar meu portfólio?')">
+                            Otimizar Portfólio
+                        </button>
+                        <button class="quick-btn" onclick="economicAdvisor.askQuickQuestion('Análise de risco atual')">
+                            Análise de Risco
+                        </button>
+                        <button class="quick-btn" onclick="economicAdvisor.askQuickQuestion('Estratégia anti-recessão')">
+                            Anti-Recessão
+                        </button>
+                    </div>
+                    <div class="chat-input-wrapper">
+                        <input type="text" id="chatInput" placeholder="Digite sua pergunta sobre investimentos..." maxlength="500">
+                        <button id="sendBtn" class="send-btn">
+                            <span>Enviar</span>
+                            <span class="send-icon">📤</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" id="loadingText">Carregando...</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script>
+        // Inicializar aplicação
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Enhanced AI Economic Advisor v2.0 Iniciado');
+            window.economicAdvisor = new EconomicAdvisor();
+        });
+    </script>
+</body>
+</html>

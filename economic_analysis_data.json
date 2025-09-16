@@ -1,0 +1,177 @@
+{
+  "global_outlook": {
+    "world_gdp_growth": 3.0,
+    "advanced_economies_growth": 1.8,
+    "emerging_markets_growth": 3.7,
+    "global_inflation": 2.9,
+    "trade_growth": 2.8,
+    "last_updated": "2025-09-15"
+  },
+  "regional_analysis": {
+    "united_states": {
+      "gdp_growth": 1.6,
+      "inflation": 3.8,
+      "unemployment": 4.2,
+      "interest_rate": 5.25,
+      "market_sentiment": "Cautious",
+      "risk_level": "Medium"
+    },
+    "europe": {
+      "gdp_growth": 1.7,
+      "inflation": 2.1,
+      "unemployment": 6.8,
+      "interest_rate": 3.75,
+      "market_sentiment": "Neutral",
+      "risk_level": "Medium"
+    },
+    "china": {
+      "gdp_growth": 4.5,
+      "inflation": 0.0,
+      "unemployment": 5.1,
+      "interest_rate": 3.45,
+      "market_sentiment": "Recovering",
+      "risk_level": "Medium-High"
+    },
+    "emerging_asia": {
+      "gdp_growth": 4.8,
+      "inflation": 3.2,
+      "unemployment": 4.5,
+      "interest_rate": 4.5,
+      "market_sentiment": "Positive",
+      "risk_level": "Medium-High"
+    },
+    "latin_america": {
+      "gdp_growth": 2.1,
+      "inflation": 4.8,
+      "unemployment": 7.2,
+      "interest_rate": 6.5,
+      "market_sentiment": "Mixed",
+      "risk_level": "High"
+    }
+  },
+  "investment_recommendations": {
+    "recession_proof_portfolio": {
+      "gold_precious_metals": 15,
+      "government_bonds": 25,
+      "cash_money_markets": 20,
+      "defensive_stocks": 20,
+      "emerging_markets": 10,
+      "alternative_investments": 10
+    },
+    "sector_recommendations": {
+      "healthcare": {
+        "weight": 18,
+        "outlook": "Positive",
+        "reason": "Aging demographics and consistent demand"
+      },
+      "utilities": {
+        "weight": 15,
+        "outlook": "Stable",
+        "reason": "Essential services with steady dividends"
+      },
+      "consumer_staples": {
+        "weight": 12,
+        "outlook": "Defensive",
+        "reason": "Recession-resistant products"
+      },
+      "technology": {
+        "weight": 20,
+        "outlook": "Selective",
+        "reason": "AI and digital transformation leaders"
+      },
+      "financials": {
+        "weight": 10,
+        "outlook": "Cautious",
+        "reason": "Interest rate sensitivity"
+      },
+      "energy": {
+        "weight": 8,
+        "outlook": "Volatile",
+        "reason": "Commodity price dependent"
+      },
+      "real_estate": {
+        "weight": 7,
+        "outlook": "Mixed",
+        "reason": "Interest rate and location dependent"
+      },
+      "industrials": {
+        "weight": 10,
+        "outlook": "Cyclical",
+        "reason": "Economic growth dependent"
+      }
+    }
+  },
+  "risk_factors": {
+    "geopolitical": {
+      "trade_tensions": "High",
+      "policy_uncertainty": "Very High",
+      "military_conflicts": "Medium",
+      "cyber_security": "High"
+    },
+    "economic": {
+      "inflation_risk": "Medium",
+      "recession_probability": "Medium",
+      "interest_rate_volatility": "High",
+      "currency_instability": "Medium"
+    },
+    "market": {
+      "equity_volatility": "High",
+      "credit_risk": "Medium",
+      "liquidity_risk": "Low",
+      "systemic_risk": "Medium"
+    }
+  },
+  "safe_haven_assets": {
+    "gold": {
+      "current_price": 3000,
+      "ytd_return": 28.5,
+      "volatility": 15.2,
+      "recommendation": "Strong Buy",
+      "allocation": "10-20%"
+    },
+    "us_treasuries": {
+      "10_year_yield": 4.2,
+      "ytd_performance": 2.1,
+      "credit_rating": "AAA",
+      "recommendation": "Buy",
+      "allocation": "20-30%"
+    },
+    "cash_equivalents": {
+      "money_market_yield": 5.1,
+      "fdic_insured": true,
+      "liquidity": "High",
+      "recommendation": "Hold",
+      "allocation": "15-25%"
+    }
+  },
+  "top_opportunities": [
+    {
+      "asset": "India Technology Stocks",
+      "expected_return": "12-18%",
+      "risk_level": "Medium-High",
+      "time_horizon": "3-5 years",
+      "reason": "Digital transformation and demographic dividend"
+    },
+    {
+      "asset": "US Healthcare REITs",
+      "expected_return": "8-12%",
+      "risk_level": "Medium",
+      "time_horizon": "5-10 years",
+      "reason": "Aging population and stable income"
+    },
+    {
+      "asset": "Renewable Energy Infrastructure",
+      "expected_return": "10-15%",
+      "risk_level": "Medium",
+      "time_horizon": "7-15 years",
+      "reason": "Government support and energy transition"
+    },
+    {
+      "asset": "Gold Mining ETFs",
+      "expected_return": "15-25%",
+      "risk_level": "High",
+      "time_horizon": "2-5 years",
+      "reason": "Inflation hedge and geopolitical uncertainty"
+    }
+  ]
+}

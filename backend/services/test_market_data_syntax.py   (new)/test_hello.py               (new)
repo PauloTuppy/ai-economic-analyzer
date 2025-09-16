@@ -1,0 +1,10 @@
+requirements.txt
+pytest
+
+backend/services/test_market_data_syntax.py
+def test_market_data_syntax():
+    assert True
+
+backend/tests/test_hello.py
+def test_hello():
+    assert True
