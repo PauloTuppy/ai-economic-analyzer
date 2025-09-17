@@ -1,86 +1,86 @@
 # 🤖 Enhanced AI Economic Advisor v2.0
 
-Uma plataforma avançada de consultoria financeira alimentada por IA, integrando **Gemini 2.5 Pro** para análise econômica inteligente e recomendações de investimento personalizadas.
+An advanced AI-powered financial advisory platform, integrating **Gemini 2.5 Pro** for intelligent economic analysis and personalized investment recommendations.
 
-## 🚀 Características Principais
+## 🚀 Key Features
 
-### 🧠 **Inteligência Artificial Avançada**
-- **Gemini 2.5 Pro Integration**: Análise contextual profunda
-- **Streaming Responses**: Respostas em tempo real via WebSocket
-- **Context-Aware Analysis**: IA que entende seu portfólio específico
+### 🧠 **Advanced Artificial Intelligence**
+- **Gemini 2.5 Pro Integration**: Deep contextual analysis
+- **Streaming Responses**: Real-time responses via WebSocket
+- **Context-Aware Analysis**: AI that understands your specific portfolio
 
-### 📊 **Analytics Profissionais**
-- **Value at Risk (VaR)**: Cálculos de risco com 95% e 99% de confiança
-- **Stress Testing**: Simulações Monte Carlo para cenários econômicos
-- **Portfolio Optimization**: Algoritmos de otimização baseados em MPT
-- **Correlation Analysis**: Matrizes de correlação interativas
+### 📊 **Professional Analytics**
+- **Value at Risk (VaR)**: Risk calculations with 95% and 99% confidence
+- **Stress Testing**: Monte Carlo simulations for economic scenarios
+- **Portfolio Optimization**: Optimization algorithms based on MPT
+- **Correlation Analysis**: Interactive correlation matrices
 
-### 🌍 **Dados Econômicos Globais**
-- **Real-Time Market Data**: Atualizações via WebSocket
-- **Economic Indicators**: Brasil, EUA, Europa e mercados emergentes
-- **Market Sentiment**: Análise de sentimento alimentada por IA
+### 🌍 **Global Economic Data**
+- **Real-Time Market Data**: Updates via WebSocket
+- **Economic Indicators**: Brazil, USA, Europe, and emerging markets
+- **Market Sentiment**: AI-powered sentiment analysis
 
-### 🏗️ **Arquitetura Enterprise**
+### 🏗️ **Enterprise Architecture**
 - **Microservices**: Flask + Redis + PostgreSQL
-- **Cloud-Native**: Kubernetes ready com auto-scaling
-- **High Availability**: Circuit breakers e fallback systems
-- **Security**: JWT authentication e audit trails
+- **Cloud-Native**: Kubernetes ready with auto-scaling
+- **High Availability**: Circuit breakers and fallback systems
+- **Security**: JWT authentication and audit trails
 
-## 🛠️ Instalação e Lançamento
+## 🛠️ Installation and Launch
 
-### Pré-requisitos
+### Prerequisites
 - Docker & Docker Compose
-- Chave API do Google Gemini
-- 4GB RAM mínimo
-- Portas 5000, 6379, 5432 disponíveis
+- Google Gemini API Key
+- Minimum 4GB RAM
+- Ports 5000, 6379, 5432 available
 
-### Lançamento Rápido
+### Quick Launch
 
 ```bash
-# Clone o repositório
+# Clone the repository
 git clone https://github.com/your-org/enhanced-ai-economic-advisor.git
 cd enhanced-ai-economic-advisor
 
-# Execute o script de lançamento
+# Execute the launch script
 chmod +x launch.sh
 ./launch.sh
 ```
 
-### Configuração Manual
+### Manual Configuration
 
 ```bash
-# 1. Configure variáveis de ambiente
+# 1. Configure environment variables
 cp .env.example .env
-# Edite .env com suas chaves de API
+# Edit .env with your API keys
 
-# 2. Build e start
+# 2. Build and start
 docker-compose -f docker/docker-compose.yml up -d
 
-# 3. Verifique saúde
+# 3. Check health
 curl http://localhost:5000/api/health
 ```
 
-## 📱 Interface do Usuário
+## 📱 User Interface
 
-### Dashboard Executivo
-- Métricas de portfólio em tempo real
-- Gráficos interativos de performance
-- Visão geral do mercado global
+### Executive Dashboard
+- Real-time portfolio metrics
+- Interactive performance charts
+- Global market overview
 
-### Gestão de Portfólio
-- Tabela de posições com dados ao vivo
-- Otimizador de portfólio com IA
-- Ferramentas de rebalanceamento
+### Portfolio Management
+- Positions table with live data
+- AI-powered portfolio optimizer
+- Rebalancing tools
 
-### Análise Econômica
-- Indicadores econômicos globais
-- Análise de tendências e correlações
-- Alertas de mudanças significativas
+### Economic Analysis
+- Global economic indicators
+- Trend and correlation analysis
+- Alerts for significant changes
 
-### Consultor AI
-- Chat inteligente com Gemini 2.5 Pro
-- Recomendações contextualizadas
-- Análise de cenários econômicos
+### AI Advisor
+- Intelligent chat with Gemini 2.5 Pro
+- Contextualized recommendations
+- Economic scenario analysis
 
 ## 🔧 API Endpoints
 
@@ -105,20 +105,20 @@ GET /api/economic/indicators
 
 ### WebSocket Events
 ```javascript
-// Conectar
+// Connect
 socket.emit('request_real_time_data')
 
-// Receber atualizações
+// Receive updates
 socket.on('market_update', (data) => {
-    // Processar dados de mercado
+    // Process market data
 })
 
 socket.on('ai_response_chunk', (data) => {
-    // Processar resposta streaming da IA
+    // Process streaming AI response
 })
 ```
 
-## 🏗️ Arquitetura
+## 🏗️ Architecture
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -134,15 +134,15 @@ socket.on('ai_response_chunk', (data) => {
                 └─────────────┘   └─────────────┘
 ```
 
-## 🚀 Deploy em Produção
+## 🚀 Production Deployment
 
 ### Google Cloud Platform (GKE)
 ```bash
-# 1. Build e push da imagem
+# 1. Build and push the image
 docker build -t gcr.io/your-project/ai-advisor:v2.0 .
 docker push gcr.io/your-project/ai-advisor:v2.0
 
-# 2. Deploy no Kubernetes
+# 2. Deploy to Kubernetes
 kubectl apply -f kubernetes/
 ```
 
@@ -155,71 +155,71 @@ aws configure
 kubectl apply -f kubernetes/
 ```
 
-## 📊 Monitoramento
+## 📊 Monitoring
 
 ### Health Checks
 ```bash
-# Verificar saúde da aplicação
+# Check application health
 curl http://localhost:5000/api/health
 
-# Métricas Prometheus
+# Prometheus metrics
 curl http://localhost:5000/metrics
 ```
 
 ### Logs
 ```bash
-# Logs da aplicação
+# Application logs
 docker-compose logs -f app
 
-# Logs do Redis
+# Redis logs
 docker-compose logs -f redis
 
-# Logs do PostgreSQL
+# PostgreSQL logs
 docker-compose logs -f postgres
 ```
 
-## 🔒 Segurança
+## 🔒 Security
 
-- **JWT Authentication**: Tokens seguros para API
-- **CORS Protection**: Configuração de origens permitidas
-- **Input Validation**: Sanitização de dados de entrada
-- **Rate Limiting**: Proteção contra abuse
-- **Audit Trails**: Log completo de transações
+- **JWT Authentication**: Secure tokens for API
+- **CORS Protection**: Allowed origins configuration
+- **Input Validation**: Input data sanitization
+- **Rate Limiting**: Protection against abuse
+- **Audit Trails**: Complete transaction log
 
-## 🧪 Testes
+## 🧪 Tests
 
 ```bash
-# Testes unitários
+# Unit tests
 pytest backend/tests/
 
-# Testes de integração
+# Integration tests
 pytest backend/tests/integration/
 
-# Testes de carga
+# Load tests
 locust -f tests/load_test.py
 ```
 
 ## 📈 Performance
 
-- **Response Time**: < 200ms para APIs
-- **Throughput**: 1000+ requests/segundo
+- **Response Time**: < 200ms for APIs
+- **Throughput**: 1000+ requests/second
 - **Availability**: 99.9% uptime
-- **Scalability**: Auto-scaling baseado em CPU/Memory
+- **Scalability**: CPU/Memory-based auto-scaling
 
-## 🤝 Contribuição
+## 🤝 Contribution
 
-1. Fork o projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
-5. Abra um Pull Request
+1. Fork the project
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
 
-## 📄 Licença
+## 📄 License
 
-Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICENSE) para detalhes.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Suporte
+## 🆘 Support
 
-- **Documentação**: [docs.ai-advisor.com](https://docs.ai-advisor.com)
+- **Documentation**: [docs.ai-advisor.com](https://docs.ai-advisor.com)
 - **Issues**: [GitHub Issues](https://github.com/your-org/enhanced-ai-economic-advisor/issues)
 - **
