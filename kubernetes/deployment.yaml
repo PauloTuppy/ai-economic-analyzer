@@ -1,159 +1,534 @@
+# Kubernetes Deployment Manifests for AI Economic Advisor
+# This file contains Deployments and Services for each microservice.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  labels:
+    app: frontend
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: frontend
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ai-economic-advisor
+  name: frontend
   labels:
-    app: ai-economic-advisor
-    version: v2.0
+    app: frontend
 spec:
-  replicas: 3
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
+  replicas: 1
   selector:
     matchLabels:
-      app: ai-economic-advisor
+      app: frontend
   template:
     metadata:
       labels:
-        app: ai-economic-advisor
-        version: v2.0
+        app: frontend
+      annotations:
+        sidecar.istio.io/inject: "true"
     spec:
       containers:
-      - name: ai-economic-advisor
-        image: gcr.io/490986947459/ai-economic-advisor:v2.0
+      - name: server
+        image: gcr.io/ai-trading-platform/frontend:v1.0
         ports:
-        - containerPort: 5000
-          name: http
+        - containerPort: 8080
         env:
-        - name: GEMINI_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: gemini-secret
-              key: api-key
-        - name: REDIS_HOST
-          value: "redis-service"
-        - name: REDIS_PORT
-          value: "6379"
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: postgres-secret
-              key: database-url
-        - name: SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: app-secret
-              key: secret-key
+        - name: PORT
+          value: "8080"
+        - name: AUTH_SERVICE_ADDR
+          value: "authservice:8080"
+        - name: PORTFOLIO_SERVICE_ADDR
+          value: "portfolioservice:8000"
+        - name: MARKET_DATA_SERVICE_ADDR
+          value: "marketdataservice:7070"
+        - name: TRADING_ENGINE_ADDR
+          value: "tradingengine:8080"
+        - name: PAYMENT_SERVICE_ADDR
+          value: "paymentservice:50051"
+        - name: NOTIFICATION_SERVICE_ADDR
+          value: "notificationservice:5000"
+        - name: RISK_MANAGEMENT_SERVICE_ADDR
+          value: "riskmanagementservice:9090"
+        - name: AI_ANALYTICS_SERVICE_ADDR
+          value: "aianalyticsservice:8501"
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "250m"
+            cpu: 100m
+            memory: 128Mi
           limits:
-            memory: "1Gi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /api/health
-            port: 5000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
+            cpu: 200m
+            memory: 256Mi
         readinessProbe:
+          initialDelaySeconds: 10
           httpGet:
-            path: /api/health
-            port: 5000
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 1000
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-        volumeMounts:
-        - name: tmp
-          mountPath: /tmp
-        - name: cache
-          mountPath: /app/cache
-      volumes:
-      - name: tmp
-        emptyDir: {}
-      - name: cache
-        emptyDir: {}
-      securityContext:
-        fsGroup: 1000
-
+            path: "/"
+            port: 8080
+        livenessProbe:
+          initialDelaySeconds: 10
+          httpGet:
+            path: "/"
+            port: 8080
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: ai-economic-advisor-service
-  labels:
-    app: ai-economic-advisor
+  name: authservice
 spec:
-  selector:
-    app: ai-economic-advisor
-  ports:
-  - port: 80
-    targetPort: 5000
-    protocol: TCP
-    name: http
   type: ClusterIP
-
+  selector:
+    app: authservice
+  ports:
+  - port: 8080
+    targetPort: 8080
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: ai-economic-advisor-ingress
-  annotations:
-    kubernetes.io/ingress.class: gce
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  name: authservice
 spec:
-  tls:
-  - hosts:
-    - advisor.yourdomain.com
-    secretName: advisor-tls
-  rules:
-  - host: advisor.yourdomain.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: ai-economic-advisor-service
-            port:
-              number: 80
-
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authservice
+  template:
+    metadata:
+      labels:
+        app: authservice
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+      - name: server
+        image: gcr.io/ai-trading-platform/authservice:v1.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        - name: REDIS_ADDR
+          value: "redis-cart:6379"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: secret
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        readinessProbe:
+          initialDelaySeconds: 5
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:8080"]
+        livenessProbe:
+          initialDelaySeconds: 5
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:8080"]
 ---
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
+apiVersion: v1
+kind: Service
 metadata:
-  name: ai-economic-advisor-hpa
+  name: portfolioservice
 spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: ai-economic-advisor
-  minReplicas: 3
-  maxReplicas: 10
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
+  type: ClusterIP
+  selector:
+    app: portfolioservice
+  ports:
+  - port: 8000
+    targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portfolioservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: portfolioservice
+  template:
+    metadata:
+      labels:
+        app: portfolioservice
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+      - name: server
+        image: gcr.io/ai-trading-platform/portfolioservice:v1.0
+        ports:
+        - containerPort: 8000
+        env:
+        - name: PORT
+          value: "8000"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: url
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        readinessProbe:
+          initialDelaySeconds: 5
+          httpGet:
+            path: "/health"
+            port: 8000
+        livenessProbe:
+          initialDelaySeconds: 5
+          httpGet:
+            path: "/health"
+            port: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: marketdataservice
+spec:
+  type: ClusterIP
+  selector:
+    app: marketdataservice
+  ports:
+  - port: 7070
+    targetPort: 7070
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: marketdataservice
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: marketdataservice
+  template:
+    metadata:
+      labels:
+        app: marketdataservice
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+      - name: server
+        image: gcr.io/ai-trading-platform/marketdataservice:v1.0
+        ports:
+        - containerPort: 7070
+        env:
+        - name: PORT
+          value: "7070"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        readinessProbe:
+          initialDelaySeconds: 5
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:7070"]
+        livenessProbe:
+          initialDelaySeconds: 5
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:7070"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tradingengine
+spec:
+  type: ClusterIP
+  selector:
+    app: tradingengine
+  ports:
+  - port: 8080
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tradingengine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tradingengine
+  template:
+    metadata:
+      labels:
+        app: tradingengine
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+      - name: server
+        image: gcr.io/ai-trading-platform/tradingengine:v1.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+        readinessProbe:
+          httpGet:
+            path: "/actuator/health"
+            port: 8080
+        livenessProbe:
+          httpGet:
+            path: "/actuator/health"
+            port: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: paymentservice
+spec:
+  type: ClusterIP
+  selector:
+    app: paymentservice
+  ports:
+  - port: 50051
+    targetPort: 50051
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paymentservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paymentservice
+  template:
+    metadata:
+      labels:
+        app: paymentservice
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+      - name: server
+        image: gcr.io/ai-trading-platform/paymentservice:v1.0
+        ports:
+        - containerPort: 50051
+        env:
+        - name: PORT
+          value: "50051"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        readinessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50051"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notificationservice
+spec:
+  type: ClusterIP
+  selector:
+    app: notificationservice
+  ports:
+  - port: 5000
+    targetPort: 5000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notificationservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notificationservice
+  template:
+    metadata:
+      labels:
+        app: notificationservice
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+      - name: server
+        image: gcr.io/ai-trading-platform/notificationservice:v1.0
+        ports:
+        - containerPort: 5000
+        env:
+        - name: PORT
+          value: "5000"
+        - name: RABBITMQ_ADDR
+          value: "rabbitmq:5672"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        readinessProbe:
+          httpGet:
+            path: "/health"
+            port: 5000
+        livenessProbe:
+          httpGet:
+            path: "/health"
+            port: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: riskmanagementservice
+spec:
+  type: ClusterIP
+  selector:
+    app: riskmanagementservice
+  ports:
+  - port: 9090
+    targetPort: 9090
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: riskmanagementservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: riskmanagementservice
+  template:
+    metadata:
+      labels:
+        app: riskmanagementservice
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+      - name: server
+        image: gcr.io/ai-trading-platform/riskmanagementservice:v1.0
+        ports:
+        - containerPort: 9090
+        env:
+        - name: PORT
+          value: "9090"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        readinessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:9090"]
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:9090"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aianalyticsservice
+spec:
+  type: ClusterIP
+  selector:
+    app: aianalyticsservice
+  ports:
+  - port: 8501
+    targetPort: 8501
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aianalyticsservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aianalyticsservice
+  template:
+    metadata:
+      labels:
+        app: aianalyticsservice
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+      - name: server
+        image: gcr.io/ai-trading-platform/aianalyticsservice:v1.0
+        ports:
+        - containerPort: 8501
+        env:
+        - name: PORT
+          value: "8501"
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: "1"
+            memory: 2Gi
+        readinessProbe:
+          httpGet:
+            path: "/v1/models/default"
+            port: 8501
+        livenessProbe:
+          httpGet:
+            path: "/v1/models/default"
+            port: 8501
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadgenerator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loadgenerator
+  template:
+    metadata:
+      labels:
+        app: loadgenerator
+    spec:
+      containers:
+      - name: main
+        image: gcr.io/ai-trading-platform/loadgenerator:v1.0
+        env:
+        - name: FRONTEND_ADDR
+          value: "frontend:80"
+        - name: USERS
+          value: "10"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 300m
+            memory: 512Mi
