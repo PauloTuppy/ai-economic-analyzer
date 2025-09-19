@@ -85,7 +85,21 @@ Uma plataforma profissional de análise econômica e gestão de portfólio com *
 
 ## 🚀 Como Executar a Plataforma
 
-### **Opção 1: Plataforma Completa com Banking (Recomendado)**
+### **🪟 Windows (Recomendado para usuários Windows)**
+```powershell
+# Setup automático
+.\setup-windows.ps1
+
+# Iniciar todos os serviços
+.\start-all-windows.ps1
+# OU clique duas vezes em: start.bat
+
+# Docker (alternativo)
+.\docker-start-windows.ps1
+```
+**📖 Veja [README-WINDOWS.md](README-WINDOWS.md) para guia completo do Windows**
+
+### **🐧 Linux/Mac: Plataforma Completa com Banking**
 ```bash
 # Terminal 1 - Serviços Bancários (Bank of Anthos Style)
 cd banking-services
@@ -95,7 +109,7 @@ python start-services.py
 # Terminal 2 - Backend Python
 cd backend
 python -m venv .venv
-.venv\Scripts\activate  # Windows
+source .venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
 python app.py
 
@@ -104,25 +118,20 @@ cd frontend
 node server.js
 ```
 
-### **Opção 2: Apenas Frontend + Backend**
+### **🐳 Docker (Todas as Plataformas)**
 ```bash
-# Terminal 1 - Backend Python
-cd backend
-python -m venv .venv
-.venv\Scripts\activate  # Windows
-pip install -r requirements.txt
-python app.py
+# Linux/Mac
+docker-compose up -d
 
-# Terminal 2 - Frontend Node.js
-cd frontend
-node server.js
+# Windows
+.\docker-start-windows.ps1
 ```
 
-### **Opção 3: Apenas Frontend**
+### **⚡ Setup Rápido (Linux/Mac)**
 ```bash
-cd frontend
-node server.js
-# Acesse: http://localhost:3002
+chmod +x dev-setup.sh
+./dev-setup.sh
+./start-all.sh
 ```
 
 ### **URLs de Acesso**
