@@ -37,7 +37,34 @@ Uma plataforma profissional de análise econômica e gestão de portfólio com *
 - **Animações Suaves**: Transições profissionais entre páginas
 - **Glass Morphism**: Efeitos visuais modernos
 
-## 🛠️ Arquitetura Técnica
+## 🏗️ **Arquitetura de Microserviços (Bank of Anthos Style)**
+
+### **🏦 Banking Services** (Python Flask)
+| Serviço | Porta | Função | Tecnologia |
+|---------|-------|--------|------------|
+| **User Service** | 5001 | Autenticação JWT + Gestão de usuários | Flask + bcrypt + SQLite |
+| **Balance Service** | 5002 | Saldos bancários + Transações financeiras | Flask + SQLite |
+| **Transaction Service** | 5003 | Ordens de investimento + Portfolio | Flask + SQLite |
+
+### **📊 Application Services**
+| Serviço | Porta | Função | Tecnologia |
+|---------|-------|--------|------------|
+| **Frontend** | 3002 | Interface SPA + Banking Integration | JavaScript ES6+ / HTML5 / CSS3 |
+| **Backend** | 5000 | Dados econômicos + Processamento Excel | Python Flask + Pandas |
+
+### **🔐 Segurança Implementada**
+- **JWT Authentication**: Tokens RS256 com expiração de 24h
+- **bcrypt**: Criptografia de senhas com salt
+- **CORS**: Configuração segura para requisições cross-origin
+- **Validação**: Verificação de saldo e holdings antes de transações
+
+### **🌐 Integração Completa**
+- **Banking Mode**: `?banking=true` ativa autenticação real
+- **Real Transactions**: Compra/venda de ativos com saldo bancário
+- **Portfolio Sync**: Sincronização entre dados simulados e reais
+- **Transaction History**: Histórico completo de operações
+
+## 🛠️ Tecnologias Utilizadas
 
 ### **Frontend** (JavaScript ES6+ / HTML5 / CSS3)
 - **Aplicação SPA**: Single Page Application com roteamento
@@ -58,7 +85,26 @@ Uma plataforma profissional de análise econômica e gestão de portfólio com *
 
 ## 🚀 Como Executar a Plataforma
 
-### **Opção 1: Frontend + Backend (Recomendado)**
+### **Opção 1: Plataforma Completa com Banking (Recomendado)**
+```bash
+# Terminal 1 - Serviços Bancários (Bank of Anthos Style)
+cd banking-services
+pip install -r requirements.txt
+python start-services.py
+
+# Terminal 2 - Backend Python
+cd backend
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+python app.py
+
+# Terminal 3 - Frontend Node.js
+cd frontend
+node server.js
+```
+
+### **Opção 2: Apenas Frontend + Backend**
 ```bash
 # Terminal 1 - Backend Python
 cd backend
@@ -72,24 +118,26 @@ cd frontend
 node server.js
 ```
 
-### **Opção 2: Apenas Frontend**
+### **Opção 3: Apenas Frontend**
 ```bash
 cd frontend
 node server.js
 # Acesse: http://localhost:3002
 ```
 
-### **Opção 3: Docker (Completo)**
-```bash
-cd docker
-docker-compose up -d
-# Acesse: http://localhost:3000
-```
-
 ### **URLs de Acesso**
 - **Português**: `http://localhost:3002/` ou `http://localhost:3002/index.html`
 - **English**: `http://localhost:3002/index-en.html`
+- **Banking Login**: `http://localhost:3002/banking-login.html`
+- **Banking Mode**: `http://localhost:3002/?banking=true`
 - **Demo Mode**: Adicione `?demo=true` para painel de demonstração interativo
+
+### **🏦 Contas Bancárias de Demonstração**
+| Usuário | Senha | Saldo Inicial | Perfil |
+|---------|-------|---------------|--------|
+| `admin` | `admin123` | R$ 50.000,00 | Administrador |
+| `investor` | `investor123` | R$ 25.000,00 | Investidor |
+| `trader` | `trader123` | R$ 15.000,00 | Trader |
 
 ## 📊 Funcionalidades Detalhadas
 
@@ -156,7 +204,27 @@ Holdings:
 • HGLG11: 220 cotas - R$ 29.304 (-4.5%)
 ```
 
-### **4. Configuração da API Gemini (Opcional)**
+### **4. Sistema Bancário Integrado (Bank of Anthos)**
+Para testar as funcionalidades bancárias completas:
+
+1. **Inicie os serviços bancários**:
+   ```bash
+   cd banking-services
+   python start-services.py
+   ```
+
+2. **Acesse o modo banking**: `http://localhost:3002/?banking=true`
+
+3. **Faça login** com uma das contas de demonstração
+
+4. **Teste as funcionalidades**:
+   - ✅ **Saldo Real**: Visualize saldo bancário atualizado
+   - ✅ **Compra de Ações**: Execute ordens com saldo real
+   - ✅ **Venda de Ações**: Realize vendas e receba o valor
+   - ✅ **Histórico**: Acompanhe todas as transações
+   - ✅ **Portfolio Real**: Sincronização com holdings bancários
+
+### **5. Configuração da API Gemini (Opcional)**
 Para ativar o chat IA real, configure sua API key do Google Gemini:
 ```javascript
 // Em frontend/gemini-integration.js, linha 3:
@@ -165,6 +233,7 @@ this.apiKey = 'SUA_API_KEY_AQUI';
 
 ## 🏆 Status de Implementação
 
+### **🎯 Funcionalidades Core (100% Completo)**
 ✅ **100% Navegação Funcional** - Todos os botões funcionam perfeitamente  
 ✅ **Dados de Mercado em Tempo Real** - Atualizações a cada 30 segundos  
 ✅ **Integração IA** - Gemini AI com respostas reais  
@@ -176,7 +245,19 @@ this.apiKey = 'SUA_API_KEY_AQUI';
 ✅ **Performance Otimizada** - Carregamento rápido e animações suaves  
 ✅ **Sistema Demo** - Teste interativo de funcionalidades  
 
-**O AI Economic Advisor é agora uma plataforma de investimentos totalmente funcional e profissional com capacidades reais de IA, predições de mercado e ferramentas abrangentes de gestão de portfólio!** 🎉
+### **🏦 Sistema Bancário (Bank of Anthos Style - 100% Completo)**
+✅ **Microserviços Bancários** - User, Balance e Transaction Services  
+✅ **Autenticação JWT** - Login seguro com tokens RS256  
+✅ **Saldos Reais** - Gestão de contas bancárias simuladas  
+✅ **Transações Reais** - Compra/venda de ativos com saldo bancário  
+✅ **Portfolio Integrado** - Sincronização entre dados simulados e reais  
+✅ **Histórico Completo** - Rastreamento de todas as operações  
+✅ **Interface Banking** - Login e dashboard bancário integrados  
+✅ **Validação de Segurança** - Verificação de saldo e holdings  
+✅ **Notificações** - Feedback em tempo real das operações  
+✅ **Health Monitoring** - Status dos serviços em tempo real  
+
+**O AI Economic Advisor é agora uma plataforma de investimentos totalmente funcional e profissional com capacidades reais de IA, predições de mercado, ferramentas abrangentes de gestão de portfólio E sistema bancário completo estilo Bank of Anthos!** 🎉🏦
 
 ## 📞 Suporte e Contribuição
 

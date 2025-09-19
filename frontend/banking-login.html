@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Economic Advisor - Banking Login</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--color-surface);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .login-header p {
+            color: var(--color-text-secondary);
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--color-text);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--color-border);
+            border-radius: 10px;
+            background: var(--color-background);
+            color: var(--color-text);
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-bottom: 20px;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .demo-accounts {
+            background: var(--color-background);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .demo-accounts h3 {
+            margin: 0 0 15px 0;
+            color: var(--color-text);
+            font-size: 1.1rem;
+        }
+
+        .demo-account {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .demo-account:last-child {
+            border-bottom: none;
+        }
+
+        .demo-account-info {
+            flex: 1;
+        }
+
+        .demo-account-name {
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .demo-account-balance {
+            font-size: 0.9rem;
+            color: var(--color-success);
+        }
+
+        .demo-login-btn {
+            padding: 6px 12px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .error-message {
+            background: var(--color-error);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .success-message {
+            background: var(--color-success);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .services-status {
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--color-background);
+            border-radius: 10px;
+        }
+
+        .service-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-healthy { background: var(--color-success); }
+        .status-unhealthy { background: var(--color-warning); }
+        .status-offline { background: var(--color-error); }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>🏦 Banking Login</h1>
+                <p>AI Economic Advisor Platform</p>
+            </div>
+
+            <div id="message-container"></div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Usuário</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <button type="submit" class="login-button" id="login-btn">
+                    Entrar
+                </button>
+            </form>
+
+            <div class="demo-accounts">
+                <h3>🎮 Contas de Demonstração</h3>
+                
+                <div class="demo-account">
+                    <div class="demo-account-info">
+                        <div class="demo-account-name">Admin</div>
+                        <div class="demo-account-balance">Saldo: R$ 50.000,00</div>
+                    </div>
+                    <button class="demo-login-btn" onclick="quickLogin('admin', 'admin123')">
+                        Login
+                    </button>
+                </div>
+
+                <div class="demo-account">
+                    <div class="demo-account-info">
+                        <div class="demo-account-name">Investidor</div>
+                        <div class="demo-account-balance">Saldo: R$ 25.000,00</div>
+                    </div>
+                    <button class="demo-login-btn" onclick="quickLogin('investor', 'investor123')">
+                        Login
+                    </button>
+                </div>
+
+                <div class="demo-account">
+                    <div class="demo-account-info">
+                        <div class="demo-account-name">Trader</div>
+                        <div class="demo-account-balance">Saldo: R$ 15.000,00</div>
+                    </div>
+                    <button class="demo-login-btn" onclick="quickLogin('trader', 'trader123')">
+                        Login
+                    </button>
+                </div>
+            </div>
+
+            <div class="services-status" id="services-status">
+                <h3>🔧 Status dos Serviços</h3>
+                <div id="services-list">
+                    <div class="service-status">
+                        <span>Verificando serviços...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="banking-integration.js"></script>
+    <script>
+        class BankingLogin {
+            constructor() {
+                this.bankingService = new BankingService();
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.checkServicesStatus();
+                
+                // Check if already logged in
+                if (this.bankingService.isAuthenticated()) {
+                    this.redirectToDashboard();
+                }
+            }
+
+            setupEventListeners() {
+                const form = document.getElementById('login-form');
+                form.addEventListener('submit', (e) => this.handleLogin(e));
+            }
+
+            async handleLogin(event) {
+                event.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const loginBtn = document.getElementById('login-btn');
+                
+                if (!username || !password) {
+                    this.showMessage('Por favor, preencha todos os campos.', 'error');
+                    return;
+                }
+
+                loginBtn.disabled = true;
+                loginBtn.innerHTML = '<span class="loading"></span> Entrando...';
+
+                try {
+                    const result = await this.bankingService.login(username, password);
+                    
+                    this.showMessage(`✅ Login realizado com sucesso! Bem-vindo, ${result.user.full_name}`, 'success');
+                    
+                    setTimeout(() => {
+                        this.redirectToDashboard();
+                    }, 1500);
+                    
+                } catch (error) {
+                    this.showMessage(`❌ Erro no login: ${error.message}`, 'error');
+                } finally {
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = 'Entrar';
+                }
+            }
+
+            async quickLogin(username, password) {
+                document.getElementById('username').value = username;
+                document.getElementById('password').value = password;
+                
+                const form = document.getElementById('login-form');
+                form.dispatchEvent(new Event('submit'));
+            }
+
+            showMessage(message, type) {
+                const container = document.getElementById('message-container');
+                const className = type === 'error' ? 'error-message' : 'success-message';
+                
+                container.innerHTML = `<div class="${className}">${message}</div>`;
+                
+                setTimeout(() => {
+                    container.innerHTML = '';
+                }, 5000);
+            }
+
+            async checkServicesStatus() {
+                try {
+                    const status = await this.bankingService.checkServicesHealth();
+                    this.displayServicesStatus(status);
+                } catch (error) {
+                    console.error('Error checking services:', error);
+                }
+            }
+
+            displayServicesStatus(status) {
+                const container = document.getElementById('services-list');
+                container.innerHTML = '';
+
+                Object.entries(status).forEach(([serviceName, serviceStatus]) => {
+                    const statusClass = `status-${serviceStatus.status}`;
+                    const statusText = serviceStatus.status === 'healthy' ? '✅ Online' : 
+                                     serviceStatus.status === 'unhealthy' ? '⚠️ Instável' : '❌ Offline';
+                    
+                    container.innerHTML += `
+                        <div class="service-status">
+                            <span>
+                                <span class="status-indicator ${statusClass}"></span>
+                                ${serviceName}
+                            </span>
+                            <span>${statusText}</span>
+                        </div>
+                    `;
+                });
+            }
+
+            redirectToDashboard() {
+                window.location.href = 'index.html?banking=true';
+            }
+        }
+
+        // Global functions
+        window.quickLogin = (username, password) => {
+            window.bankingLogin.quickLogin(username, password);
+        };
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.bankingLogin = new BankingLogin();
+        });
+    </script>
+</body>
+</html>

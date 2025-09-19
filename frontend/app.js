@@ -6,6 +6,7 @@ class EconomicAdvisor {
         this.charts = {};
         this.chatHistory = [];
         this.realTimeInterval = null;
+        this.bankingMode = new URLSearchParams(window.location.search).get('banking') === 'true';
         
         // Initialize AI services if available
         try {
@@ -13,6 +14,16 @@ class EconomicAdvisor {
             this.marketStrategy = window.MarketStrategyEngine ? new MarketStrategyEngine() : null;
         } catch (error) {
             console.warn('AI services not available:', error);
+        }
+        
+        // Initialize Banking Service if in banking mode
+        if (this.bankingMode) {
+            try {
+                this.bankingService = window.BankingService ? new BankingService() : null;
+                this.checkBankingAuthentication();
+            } catch (error) {
+                console.warn('Banking service not available:', error);
+            }
         }
         
         // Portfolio data with real-time simulation
@@ -48,6 +59,15 @@ class EconomicAdvisor {
         };
         
         this.init();
+    }
+
+    checkBankingAuthentication() {
+        if (this.bankingMode && this.bankingService && !this.bankingService.isAuthenticated()) {
+            // Redirect to banking login if not authenticated
+            window.location.href = 'banking-login.html';
+            return false;
+        }
+        return true;
     }
 
     init() {
@@ -207,7 +227,12 @@ class EconomicAdvisor {
         }
     }
 
-    updateDashboardData() {
+    async updateDashboardData() {
+        // Update banking information if in banking mode
+        if (this.bankingMode && this.bankingService && this.bankingService.isAuthenticated()) {
+            await this.updateBankingData();
+        }
+        
         // Update portfolio value
         const portfolioValueEl = document.getElementById('portfolioValue');
         if (portfolioValueEl) {
@@ -219,6 +244,70 @@ class EconomicAdvisor {
         
         // Update AI insights
         this.updateAIInsights();
+    }
+
+    async updateBankingData() {
+        try {
+            // Get current balance
+            const balanceData = await this.bankingService.getBalance();
+            
+            // Get portfolio from banking service
+            const portfolioData = await this.bankingService.getPortfolio();
+            
+            // Update UI with banking data
+            this.displayBankingInfo(balanceData, portfolioData);
+            
+        } catch (error) {
+            console.error('Error updating banking data:', error);
+        }
+    }
+
+    displayBankingInfo(balanceData, portfolioData) {
+        // Add banking info to dashboard
+        const dashboardContent = document.querySelector('.dashboard-content');
+        if (!dashboardContent) return;
+
+        // Check if banking panel already exists
+        let bankingPanel = document.getElementById('banking-panel');
+        if (!bankingPanel) {
+            bankingPanel = document.createElement('div');
+            bankingPanel.id = 'banking-panel';
+            bankingPanel.className = 'banking-panel';
+            dashboardContent.insertBefore(bankingPanel, dashboardContent.firstChild);
+        }
+
+        const user = this.bankingService.currentUser;
+        
+        bankingPanel.innerHTML = `
+            <div class="banking-header">
+                <h3>🏦 Conta Bancária</h3>
+                <div class="user-info">
+                    <span class="user-name">${user.full_name}</span>
+                    <span class="account-number">Conta: ${user.account_number}</span>
+                </div>
+            </div>
+            <div class="banking-balance">
+                <div class="balance-item">
+                    <span class="balance-label">Saldo Disponível:</span>
+                    <span class="balance-value">${this.bankingService.formatCurrency(balanceData.available_balance)}</span>
+                </div>
+                <div class="balance-item">
+                    <span class="balance-label">Saldo Total:</span>
+                    <span class="balance-value">${this.bankingService.formatCurrency(balanceData.balance)}</span>
+                </div>
+            </div>
+            <div class="banking-actions">
+                <button class="btn-primary" onclick="app.showInvestmentModal()">
+                    💰 Investir Agora
+                </button>
+                <button class="btn-secondary" onclick="app.showTransactionHistory()">
+                    📊 Histórico
+                </button>
+                <button class="btn-secondary" onclick="app.logout()">
+                    🚪 Sair
+                </button>
+            </div>
+        `;
     }
 
     updateEconomicIndicators() {
@@ -896,3 +985,152 @@ window.addEventListener('unhandledrejection', (event) => {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = EconomicAdvisor;
 }
+    /
+/ Banking Methods
+    showInvestmentModal() {
+        const modal = document.createElement('div');
+        modal.className = 'investment-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>💰 Investir em Ações</h3>
+                    <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Ação:</label>
+                        <select id="investment-symbol">
+                            <option value="PETR4">PETR4 - Petrobras</option>
+                            <option value="ITUB3">ITUB3 - Itaú</option>
+                            <option value="BIDI4">BIDI4 - Banco Inter</option>
+                            <option value="KNRI11">KNRI11 - Kinea</option>
+                            <option value="HGLG11">HGLG11 - HGLG</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantidade:</label>
+                        <input type="number" id="investment-quantity" min="1" value="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Preço por Ação:</label>
+                        <input type="number" id="investment-price" step="0.01" value="20.00">
+                    </div>
+                    <div class="investment-total">
+                        <strong>Total: <span id="investment-total">R$ 2.000,00</span></strong>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" onclick="app.executeInvestment()">
+                        Comprar Ações
+                    </button>
+                    <button class="btn-secondary" onclick="this.parentElement.parentElement.parentElement.remove()">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Update total when values change
+        const quantityInput = document.getElementById('investment-quantity');
+        const priceInput = document.getElementById('investment-price');
+        const totalSpan = document.getElementById('investment-total');
+        
+        const updateTotal = () => {
+            const quantity = parseFloat(quantityInput.value) || 0;
+            const price = parseFloat(priceInput.value) || 0;
+            const total = quantity * price;
+            totalSpan.textContent = this.formatCurrency(total);
+        };
+        
+        quantityInput.addEventListener('input', updateTotal);
+        priceInput.addEventListener('input', updateTotal);
+    }
+
+    async executeInvestment() {
+        const symbol = document.getElementById('investment-symbol').value;
+        const quantity = parseInt(document.getElementById('investment-quantity').value);
+        const price = parseFloat(document.getElementById('investment-price').value);
+        
+        if (!symbol || quantity <= 0 || price <= 0) {
+            alert('Por favor, preencha todos os campos corretamente.');
+            return;
+        }
+
+        try {
+            const result = await this.bankingService.buyAsset(symbol, quantity, price);
+            
+            // Show success message
+            this.showNotification(`✅ ${result.message}`, 'success');
+            
+            // Close modal
+            document.querySelector('.investment-modal').remove();
+            
+            // Refresh data
+            await this.updateDashboardData();
+            this.populateHoldingsTable();
+            
+        } catch (error) {
+            this.showNotification(`❌ Erro na compra: ${error.message}`, 'error');
+        }
+    }
+
+    async showTransactionHistory() {
+        try {
+            const history = await this.bankingService.getTransactionHistory();
+            
+            const modal = document.createElement('div');
+            modal.className = 'transaction-modal';
+            modal.innerHTML = `
+                <div class="modal-content large">
+                    <div class="modal-header">
+                        <h3>📊 Histórico de Transações</h3>
+                        <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="transaction-list">
+                            ${history.orders.map(order => `
+                                <div class="transaction-item">
+                                    <div class="transaction-info">
+                                        <span class="transaction-symbol">${order.symbol}</span>
+                                        <span class="transaction-type ${order.order_type}">${order.order_type.toUpperCase()}</span>
+                                        <span class="transaction-quantity">${order.quantity} ações</span>
+                                    </div>
+                                    <div class="transaction-details">
+                                        <span class="transaction-amount">${this.formatCurrency(order.total_amount)}</span>
+                                        <span class="transaction-date">${new Date(order.created_at).toLocaleDateString('pt-BR')}</span>
+                                        <span class="transaction-status ${order.status}">${order.status}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+        } catch (error) {
+            this.showNotification(`❌ Erro ao carregar histórico: ${error.message}`, 'error');
+        }
+    }
+
+    logout() {
+        if (this.bankingService) {
+            this.bankingService.logout();
+        }
+        window.location.href = 'banking-login.html';
+    }
+
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
