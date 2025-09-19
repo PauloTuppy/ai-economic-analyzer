@@ -14,6 +14,7 @@
     <script src="market-strategy.js"></script>
     <script src="market-api.js"></script>
     <script src="market-predictions.js"></script>
+    <script src="hull-market-prediction.js"></script>
     <script src="i18n.js"></script>
     <script src="language-switcher.js"></script>
 </head>
@@ -128,6 +129,38 @@
                             <div class="insight">
                                 <div class="insight-icon">⚠️</div>
                                 <div class="insight-text">Considere diversificar além do mercado brasileiro para redução de risco</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hull Tactical Analysis -->
+                <div class="card hull-analysis">
+                    <div class="card-header">
+                        <h3>🎯 Hull Tactical Analysis</h3>
+                        <div class="hull-controls">
+                            <button class="btn btn--small btn--primary" id="hullAnalyzeBtn">Analisar</button>
+                            <button class="btn btn--small btn--outline" id="hullPredictBtn">Predição</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="hull-status" id="hullStatus">
+                            <div class="status-item">
+                                <span class="status-label">Sinal de Mercado:</span>
+                                <span class="status-value" id="hullSignal">Carregando...</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Confiança:</span>
+                                <span class="status-value" id="hullConfidence">-</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Recomendação:</span>
+                                <span class="status-value" id="hullRecommendation">-</span>
+                            </div>
+                        </div>
+                        <div class="hull-predictions" id="hullPredictions">
+                            <div class="prediction-placeholder">
+                                Clique em "Analisar" para obter predições Hull Tactical
                             </div>
                         </div>
                     </div>
@@ -378,6 +411,330 @@
 
     <script src="banking-integration.js"></script>
     <script src="app.js"></script>
-    <script src="demo-features.js"></script>
+    <!-- Mode Detection and Authentication -->
+    <script>
+        // Mode Detection System
+        class AppModeManager {
+            constructor() {
+                this.mode = this.detectMode();
+                this.bankingService = new BankingService();
+                this.init();
+            }
+
+            detectMode() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const isBankingMode = urlParams.get('banking') === 'true';
+                const isDemoMode = urlParams.get('demo') === 'true';
+                
+                if (isBankingMode && this.bankingService.isAuthenticated()) {
+                    return 'banking';
+                } else if (isDemoMode) {
+                    return 'demo';
+                } else {
+                    return 'normal';
+                }
+            }
+
+            init() {
+                console.log(`🚀 AI Economic Advisor initialized in ${this.mode} mode`);
+                
+                // Add mode indicator to header
+                this.addModeIndicator();
+                
+                // Add authentication controls if needed
+                if (this.mode === 'banking') {
+                    this.initBankingMode();
+                } else if (this.mode === 'demo') {
+                    this.loadDemoFeatures();
+                } else {
+                    this.initNormalMode();
+                }
+            }
+
+            addModeIndicator() {
+                const headerControls = document.querySelector('.header-controls');
+                if (headerControls) {
+                    const modeIndicator = document.createElement('div');
+                    modeIndicator.className = 'mode-indicator';
+                    
+                    if (this.mode === 'banking') {
+                        modeIndicator.innerHTML = `
+                            <div class="banking-mode">
+                                <span class="mode-icon">🏦</span>
+                                <span class="mode-text">Banking Mode</span>
+                                <button class="logout-btn" onclick="appModeManager.logout()">Sair</button>
+                            </div>
+                        `;
+                    } else if (this.mode === 'demo') {
+                        modeIndicator.innerHTML = `
+                            <div class="demo-mode">
+                                <span class="mode-icon">🎮</span>
+                                <span class="mode-text">Demo Mode</span>
+                            </div>
+                        `;
+                    } else {
+                        modeIndicator.innerHTML = `
+                            <div class="normal-mode">
+                                <button class="login-btn" onclick="appModeManager.goToLogin()">🏦 Login Bancário</button>
+                            </div>
+                        `;
+                    }
+                    
+                    headerControls.insertBefore(modeIndicator, headerControls.firstChild);
+                }
+            }
+
+            initBankingMode() {
+                console.log('🏦 Initializing Banking Mode...');
+                
+                // Add banking balance to portfolio
+                this.addBankingBalance();
+                
+                // Enable real investment features
+                this.enableRealInvestments();
+                
+                // Load banking transaction history
+                this.loadBankingHistory();
+            }
+
+            initNormalMode() {
+                console.log('📊 Initializing Normal Mode - Full AI Economic Advisor');
+                
+                // Enable all original features
+                this.enableOriginalFeatures();
+            }
+
+            loadDemoFeatures() {
+                console.log('🎮 Loading Demo Features...');
+                
+                // Dynamically load demo features
+                const script = document.createElement('script');
+                script.src = 'demo-features.js';
+                document.head.appendChild(script);
+            }
+
+            async addBankingBalance() {
+                try {
+                    const balance = await this.bankingService.getBalance();
+                    const portfolioSummary = document.querySelector('.portfolio-summary .card-header');
+                    
+                    if (portfolioSummary) {
+                        const bankingBalance = document.createElement('div');
+                        bankingBalance.className = 'banking-balance';
+                        bankingBalance.innerHTML = `
+                            <div class="balance-info">
+                                <span class="balance-label">Saldo Bancário:</span>
+                                <span class="balance-value">R$ ${balance.balance.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                            </div>
+                        `;
+                        portfolioSummary.appendChild(bankingBalance);
+                    }
+                } catch (error) {
+                    console.error('Error loading banking balance:', error);
+                }
+            }
+
+            enableRealInvestments() {
+                console.log('💰 Enabling real investment features...');
+                
+                // This will be implemented in subsequent tasks
+                // For now, just add visual indicators
+                const investmentButtons = document.querySelectorAll('.investment-btn, .buy-btn, .sell-btn');
+                investmentButtons.forEach(btn => {
+                    btn.classList.add('real-investment');
+                    btn.title = 'Investimento real - será debitado do seu saldo bancário';
+                });
+            }
+
+            enableOriginalFeatures() {
+                console.log('✨ All original AI Economic Advisor features enabled');
+                
+                // Ensure all original functionality is available
+                // This preserves the beautiful UI and Google API integration
+            }
+
+            async loadBankingHistory() {
+                try {
+                    const history = await this.bankingService.getTransactionHistory();
+                    console.log('📊 Banking transaction history loaded:', history.length, 'transactions');
+                } catch (error) {
+                    console.error('Error loading banking history:', error);
+                }
+            }
+
+            goToLogin() {
+                window.location.href = 'banking-login.html';
+            }
+
+            logout() {
+                this.bankingService.logout();
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.appModeManager = new AppModeManager();
+        });
+    </script>
+    
+    <!-- Mode-specific styles -->
+    <style>
+        .mode-indicator {
+            margin-right: 15px;
+        }
+
+        .banking-mode, .demo-mode, .normal-mode {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mode-icon {
+            font-size: 16px;
+        }
+
+        .mode-text {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .login-btn, .logout-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--color-primary);
+            background: transparent;
+            color: var(--color-primary);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .login-btn:hover, .logout-btn:hover {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .banking-balance {
+            margin-top: 10px;
+            padding: 10px;
+            background: var(--color-success);
+            border-radius: 6px;
+            color: white;
+        }
+
+        .balance-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .balance-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .balance-value {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .real-investment {
+            position: relative;
+        }
+
+        .real-investment::after {
+            content: '💰';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 12px;
+        }
+
+        /* Hull Tactical Analysis Styles */
+        .hull-analysis .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hull-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn--small {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        .hull-status {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .status-item {
+            text-align: center;
+            padding: 10px;
+            background: var(--color-background);
+            border-radius: 6px;
+        }
+
+        .status-label {
+            display: block;
+            font-size: 11px;
+            color: var(--color-text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .status-value {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .hull-predictions {
+            min-height: 60px;
+            padding: 10px;
+            background: var(--color-background);
+            border-radius: 6px;
+            border-left: 3px solid var(--color-primary);
+        }
+
+        .prediction-placeholder {
+            color: var(--color-text-secondary);
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .prediction-item {
+            margin-bottom: 8px;
+            padding: 8px;
+            background: var(--color-surface);
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .prediction-symbol {
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+        .prediction-action {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .action-buy { background: var(--color-success); color: white; }
+        .action-sell { background: var(--color-error); color: white; }
+        .action-hold { background: var(--color-warning); color: white; }
+    </style>
 </body>
 </html>

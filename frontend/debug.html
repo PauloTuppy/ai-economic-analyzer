@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - AI Economic Advisor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo">
+                <h2>AI Economic Advisor - Debug</h2>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item active" data-page="dashboard" onclick="testNavigation('dashboard')">Dashboard</button>
+                <button class="nav-item" data-page="portfolio" onclick="testNavigation('portfolio')">Portfólio</button>
+                <button class="nav-item" data-page="economic" onclick="testNavigation('economic')">Análise Econômica</button>
+                <button class="nav-item" data-page="risk" onclick="testNavigation('risk')">Avaliação de Risco</button>
+                <button class="nav-item" data-page="chat" onclick="testNavigation('chat')">Chat IA</button>
+                <button class="nav-item" data-page="settings" onclick="testNavigation('settings')">Configurações</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="page active" id="dashboard">
+            <h2>Dashboard</h2>
+            <p>Esta é a página do Dashboard</p>
+        </div>
+        
+        <div class="page" id="portfolio">
+            <h2>Portfólio</h2>
+            <p>Esta é a página do Portfólio</p>
+        </div>
+        
+        <div class="page" id="economic">
+            <h2>Análise Econômica</h2>
+            <p>Esta é a página de Análise Econômica</p>
+        </div>
+        
+        <div class="page" id="risk">
+            <h2>Avaliação de Risco</h2>
+            <p>Esta é a página de Avaliação de Risco</p>
+        </div>
+        
+        <div class="page" id="chat">
+            <h2>Chat IA</h2>
+            <p>Esta é a página do Chat IA</p>
+        </div>
+        
+        <div class="page" id="settings">
+            <h2>Configurações</h2>
+            <p>Esta é a página de Configurações</p>
+        </div>
+    </main>
+
+    <script>
+        function testNavigation(page) {
+            console.log('🔄 Testing navigation to:', page);
+            
+            // Update navigation active state
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const activeNavItem = document.querySelector(`[data-page="${page}"]`);
+            if (activeNavItem) {
+                activeNavItem.classList.add('active');
+                console.log('✅ Active nav item updated');
+            }
+
+            // Show/hide pages
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active');
+                p.style.display = 'none';
+            });
+            
+            const targetPage = document.getElementById(page);
+            if (targetPage) {
+                targetPage.style.display = 'block';
+                targetPage.classList.add('active');
+                console.log('✅ Page switched to:', page);
+            } else {
+                console.error('❌ Page not found:', page);
+            }
+        }
+
+        // Test if JavaScript is working
+        console.log('🚀 Debug page loaded');
+        
+        // Test event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('✅ DOM loaded');
+            
+            // Test navigation buttons with event listeners
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = e.target.getAttribute('data-page');
+                    console.log('🖱️ Button clicked:', page);
+                    if (page) {
+                        testNavigation(page);
+                    }
+                });
+            });
+            
+            console.log('✅ Event listeners added');
+        });
+    </script>
+</body>
+</html>

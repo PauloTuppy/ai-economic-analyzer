@@ -24,7 +24,10 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  let filePath = '.' + req.url;
+  // Parse URL to handle query parameters
+  const url = new URL(req.url, `http://localhost:${port}`);
+  let filePath = '.' + url.pathname;
+  
   if (filePath === './') {
     filePath = './index.html';
   }

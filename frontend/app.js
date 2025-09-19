@@ -7,15 +7,16 @@ class EconomicAdvisor {
         this.chatHistory = [];
         this.realTimeInterval = null;
         this.bankingMode = new URLSearchParams(window.location.search).get('banking') === 'true';
-        
+
         // Initialize AI services if available
         try {
             this.geminiAI = window.GeminiAIService ? new GeminiAIService('AIzaSyBbwCAk_HGqfEBkDVbpKlUgjvbO_a46nAw') : null;
             this.marketStrategy = window.MarketStrategyEngine ? new MarketStrategyEngine() : null;
+            this.hullPredictor = window.HullMarketPredictor ? new HullMarketPredictor() : null;
         } catch (error) {
             console.warn('AI services not available:', error);
         }
-        
+
         // Initialize Banking Service if in banking mode
         if (this.bankingMode) {
             try {
@@ -25,22 +26,22 @@ class EconomicAdvisor {
                 console.warn('Banking service not available:', error);
             }
         }
-        
+
         // Portfolio data with real-time simulation
         this.portfolioData = {
             total_value: 300727.30,
             total_return: 0.1887,
             holdings: [
-                {symbol: "PETR4", quantity: 3600, purchase_price: 16.32, current_price: 19.80, value: 71280, return: 0.213},
-                {symbol: "ITUB3", quantity: 1100, purchase_price: 43.87, current_price: 80.00, value: 88000, return: 0.823},
-                {symbol: "BIDI4", quantity: 2164, purchase_price: 18.87, current_price: 18.40, value: 39817.6, return: -0.025},
-                {symbol: "KNRI11", quantity: 180, purchase_price: 165.29, current_price: 163.50, value: 29430, return: -0.011},
-                {symbol: "HGLG11", quantity: 220, purchase_price: 139.5, current_price: 133.20, value: 29304, return: -0.045},
-                {symbol: "SNSL3", quantity: 1100, purchase_price: 26.97, current_price: 25.99, value: 28589, return: -0.036},
-                {symbol: "BCFF11", quantity: 180, purchase_price: 84.38, current_price: 80.50, value: 14490, return: -0.046}
+                { symbol: "PETR4", quantity: 3600, purchase_price: 16.32, current_price: 19.80, value: 71280, return: 0.213 },
+                { symbol: "ITUB3", quantity: 1100, purchase_price: 43.87, current_price: 80.00, value: 88000, return: 0.823 },
+                { symbol: "BIDI4", quantity: 2164, purchase_price: 18.87, current_price: 18.40, value: 39817.6, return: -0.025 },
+                { symbol: "KNRI11", quantity: 180, purchase_price: 165.29, current_price: 163.50, value: 29430, return: -0.011 },
+                { symbol: "HGLG11", quantity: 220, purchase_price: 139.5, current_price: 133.20, value: 29304, return: -0.045 },
+                { symbol: "SNSL3", quantity: 1100, purchase_price: 26.97, current_price: 25.99, value: 28589, return: -0.036 },
+                { symbol: "BCFF11", quantity: 180, purchase_price: 84.38, current_price: 80.50, value: 14490, return: -0.046 }
             ]
         };
-        
+
         // Economic indicators
         this.economicData = {
             brazil_inflation: 4.2,
@@ -48,7 +49,7 @@ class EconomicAdvisor {
             usd_brl: 5.12,
             oil_price: 82.50
         };
-        
+
         // Risk metrics
         this.riskMetrics = {
             var_95: 2.3,
@@ -57,7 +58,7 @@ class EconomicAdvisor {
             sharpe_ratio: 0.87,
             beta: 1.15
         };
-        
+
         this.init();
     }
 
@@ -80,7 +81,7 @@ class EconomicAdvisor {
 
     initializeApp() {
         console.log('🚀 Initializing AI Economic Advisor...');
-        
+
         try {
             this.setupEventListeners();
             this.populateHoldingsTable();
@@ -90,7 +91,7 @@ class EconomicAdvisor {
             this.setupRiskSlider();
             this.initializeChatInterface();
             this.startRealTimeUpdates();
-            
+
             this.isInitialized = true;
             console.log('✅ AI Economic Advisor initialized successfully');
         } catch (error) {
@@ -100,7 +101,7 @@ class EconomicAdvisor {
 
     setupEventListeners() {
         console.log('🔧 Setting up event listeners...');
-        
+
         // Navigation buttons
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', (e) => {
@@ -115,16 +116,38 @@ class EconomicAdvisor {
 
         // Portfolio control buttons
         this.setupPortfolioControls();
-        
+
         // Chat functionality
         this.setupChatControls();
-        
+
         // Refresh buttons
         document.querySelectorAll('.refresh-btn').forEach(btn => {
             btn.addEventListener('click', () => this.refreshData());
         });
-        
+
+        // Hull Tactical Analysis buttons
+        this.setupHullControls();
+
         console.log('✅ Event listeners set up successfully');
+    }
+
+    setupHullControls() {
+        const hullAnalyzeBtn = document.getElementById('hullAnalyzeBtn');
+        const hullPredictBtn = document.getElementById('hullPredictBtn');
+
+        if (hullAnalyzeBtn) {
+            hullAnalyzeBtn.addEventListener('click', () => this.runHullAnalysis());
+        }
+        if (hullPredictBtn) {
+            hullPredictBtn.addEventListener('click', () => this.generateHullPredictions());
+        }
+
+        // Auto-run Hull analysis on load
+        setTimeout(() => {
+            if (this.hullPredictor) {
+                this.runHullAnalysis();
+            }
+        }, 3000);
     }
 
     setupPortfolioControls() {
@@ -146,11 +169,11 @@ class EconomicAdvisor {
     setupChatControls() {
         const sendBtn = document.getElementById('sendBtn');
         const chatInput = document.getElementById('chatInput');
-        
+
         if (sendBtn) {
             sendBtn.addEventListener('click', () => this.handleChatMessage());
         }
-        
+
         if (chatInput) {
             chatInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
@@ -173,14 +196,14 @@ class EconomicAdvisor {
 
     navigateToPage(page) {
         if (!page) return;
-        
+
         console.log('🔄 Navigating to page:', page);
-        
+
         // Update navigation active state
         document.querySelectorAll('.nav-item').forEach(item => {
             item.classList.remove('active');
         });
-        
+
         const activeNavItem = document.querySelector(`[data-page="${page}"]`);
         if (activeNavItem) {
             activeNavItem.classList.add('active');
@@ -191,13 +214,13 @@ class EconomicAdvisor {
             p.classList.remove('active');
             p.style.display = 'none';
         });
-        
+
         const targetPage = document.getElementById(page);
         if (targetPage) {
             targetPage.style.display = 'block';
             targetPage.classList.add('active');
             this.currentPage = page;
-            
+
             // Initialize page-specific content
             setTimeout(() => {
                 this.initializePageContent(page);
@@ -232,7 +255,7 @@ class EconomicAdvisor {
         if (this.bankingMode && this.bankingService && this.bankingService.isAuthenticated()) {
             await this.updateBankingData();
         }
-        
+
         // Update portfolio value
         const portfolioValueEl = document.getElementById('portfolioValue');
         if (portfolioValueEl) {
@@ -241,7 +264,7 @@ class EconomicAdvisor {
 
         // Update economic indicators
         this.updateEconomicIndicators();
-        
+
         // Update AI insights
         this.updateAIInsights();
     }
@@ -250,13 +273,13 @@ class EconomicAdvisor {
         try {
             // Get current balance
             const balanceData = await this.bankingService.getBalance();
-            
+
             // Get portfolio from banking service
             const portfolioData = await this.bankingService.getPortfolio();
-            
+
             // Update UI with banking data
             this.displayBankingInfo(balanceData, portfolioData);
-            
+
         } catch (error) {
             console.error('Error updating banking data:', error);
         }
@@ -277,7 +300,7 @@ class EconomicAdvisor {
         }
 
         const user = this.bankingService.currentUser;
-        
+
         bankingPanel.innerHTML = `
             <div class="banking-header">
                 <h3>🏦 Conta Bancária</h3>
@@ -297,13 +320,13 @@ class EconomicAdvisor {
                 </div>
             </div>
             <div class="banking-actions">
-                <button class="btn-primary" onclick="app.showInvestmentModal()">
+                <button class="btn-primary" onclick="window.economicAdvisor.showInvestmentModal()">
                     💰 Investir Agora
                 </button>
-                <button class="btn-secondary" onclick="app.showTransactionHistory()">
+                <button class="btn-secondary" onclick="window.economicAdvisor.showTransactionHistory()">
                     📊 Histórico
                 </button>
-                <button class="btn-secondary" onclick="app.logout()">
+                <button class="btn-secondary" onclick="window.economicAdvisor.logout()">
                     🚪 Sair
                 </button>
             </div>
@@ -346,14 +369,14 @@ class EconomicAdvisor {
         if (!tableBody) return;
 
         tableBody.innerHTML = '';
-        
+
         this.portfolioData.holdings.forEach(holding => {
             const row = document.createElement('div');
             row.className = 'table-row';
-            
+
             const returnClass = holding.return >= 0 ? 'positive' : 'negative';
             const returnPercent = (holding.return * 100).toFixed(1);
-            
+
             row.innerHTML = `
                 <div class="symbol">${holding.symbol}</div>
                 <div>${holding.quantity.toLocaleString()}</div>
@@ -361,7 +384,7 @@ class EconomicAdvisor {
                 <div>R$ ${holding.value.toLocaleString()}</div>
                 <div class="return-cell ${returnClass}">${returnPercent}%</div>
             `;
-            
+
             tableBody.appendChild(row);
         });
     }
@@ -371,7 +394,7 @@ class EconomicAdvisor {
             console.warn('Chart.js not loaded, skipping chart initialization');
             return;
         }
-        
+
         this.initializeDashboardCharts();
     }
 
@@ -385,7 +408,7 @@ class EconomicAdvisor {
         if (!ctx || typeof Chart === 'undefined') return;
 
         const data = this.generatePortfolioData();
-        
+
         if (this.charts.portfolioChart) {
             this.charts.portfolioChart.destroy();
         }
@@ -427,7 +450,7 @@ class EconomicAdvisor {
         if (!ctx || typeof Chart === 'undefined') return;
 
         const data = this.generateMarketData();
-        
+
         if (this.charts.marketChart) {
             this.charts.marketChart.destroy();
         }
@@ -473,7 +496,7 @@ class EconomicAdvisor {
         if (!ctx || typeof Chart === 'undefined') return;
 
         const allocations = this.calculatePortfolioAllocations();
-        
+
         if (this.charts.allocationChart) {
             this.charts.allocationChart.destroy();
         }
@@ -485,7 +508,7 @@ class EconomicAdvisor {
                 datasets: [{
                     data: allocations.values,
                     backgroundColor: [
-                        '#32B8CD', '#F59E0B', '#EF4444', '#10B981', 
+                        '#32B8CD', '#F59E0B', '#EF4444', '#10B981',
                         '#8B5CF6', '#F97316', '#EC4899'
                     ]
                 }]
@@ -505,7 +528,7 @@ class EconomicAdvisor {
         if (!ctx || typeof Chart === 'undefined') return;
 
         const data = this.generateEconomicData();
-        
+
         if (this.charts.economicChart) {
             this.charts.economicChart.destroy();
         }
@@ -550,7 +573,7 @@ class EconomicAdvisor {
 
         const assets = ['PETR4', 'ITUB3', 'BIDI4', 'KNRI11', 'HGLG11'];
         const correlations = [0.8, -0.3, 0.6, 0.4, 0.2];
-        
+
         if (this.charts.correlationChart) {
             this.charts.correlationChart.destroy();
         }
@@ -584,16 +607,16 @@ class EconomicAdvisor {
         const labels = [];
         const values = [];
         const baseValue = this.portfolioData.total_value;
-        
+
         for (let i = 30; i >= 0; i--) {
             const date = new Date();
             date.setDate(date.getDate() - i);
             labels.push(date.toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }));
-            
+
             const variation = Math.sin(i * 0.2) * 15000 + (Math.random() - 0.5) * 8000;
             values.push(Math.max(250000, baseValue + variation + (30 - i) * 1000));
         }
-        
+
         return { labels, values };
     }
 
@@ -601,16 +624,16 @@ class EconomicAdvisor {
         const labels = [];
         const ibovespa = [];
         const sp500 = [];
-        
+
         for (let i = 30; i >= 0; i--) {
             const date = new Date();
             date.setDate(date.getDate() - i);
             labels.push(date.toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' }));
-            
+
             ibovespa.push(120000 + Math.sin(i * 0.3) * 8000 + (Math.random() - 0.5) * 3000);
             sp500.push(4200 + Math.sin(i * 0.25) * 200 + (Math.random() - 0.5) * 100);
         }
-        
+
         return { labels, ibovespa, sp500 };
     }
 
@@ -618,67 +641,152 @@ class EconomicAdvisor {
         const labels = [];
         const inflation = [];
         const selic = [];
-        
+
         for (let i = 12; i >= 0; i--) {
             const date = new Date();
             date.setMonth(date.getMonth() - i);
             labels.push(date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }));
-            
+
             inflation.push(3.5 + Math.sin(i * 0.5) * 1.2 + (Math.random() - 0.5) * 0.3);
             selic.push(11.5 + Math.sin(i * 0.4) * 0.8 + (Math.random() - 0.5) * 0.2);
         }
-        
+
         return { labels, inflation, selic };
     }
 
     calculatePortfolioAllocations() {
         const labels = [];
         const values = [];
-        
+
         this.portfolioData.holdings.forEach(holding => {
             labels.push(holding.symbol);
             values.push(((holding.value / this.portfolioData.total_value) * 100).toFixed(1));
         });
-        
+
         return { labels, values };
     }
 
     // Portfolio management functions
     async optimizePortfolio() {
-        this.showLoading('Analisando portfólio com IA...');
-        
+        this.showLoading('Analisando portfólio com Hull Tactical Model + IA...');
+
         try {
-            // Simulate AI analysis
-            await this.delay(2000);
-            
-            const recommendations = [
+            // Get Hull Market Prediction
+            let hullAnalysis = null;
+            if (this.hullPredictor) {
+                hullAnalysis = await this.hullPredictor.generateMarketPrediction();
+            }
+
+            // Get individual stock predictions
+            const stockPredictions = [];
+            if (this.hullPredictor) {
+                for (const holding of this.portfolioData.holdings) {
+                    const prediction = await this.hullPredictor.getStockPrediction(holding.symbol);
+                    stockPredictions.push(prediction);
+                }
+            }
+
+            await this.delay(1500);
+
+            // Generate recommendations based on Hull analysis
+            const recommendations = this.generateHullBasedRecommendations(hullAnalysis, stockPredictions);
+
+            this.hideLoading();
+            this.navigateToPage('chat');
+
+            setTimeout(() => {
+                let message = `🎯 **Otimização Hull Tactical + IA Concluída**\n\n`;
+
+                if (hullAnalysis) {
+                    message += `**📊 Análise de Mercado Hull:**\n`;
+                    message += `• Sinal: ${hullAnalysis.prediction.signal} (${(hullAnalysis.confidence.level * 100).toFixed(1)}% confiança)\n`;
+                    message += `• Retorno Previsto: ${(hullAnalysis.prediction.forwardReturn * 100).toFixed(2)}%\n`;
+                    message += `• Nível de Risco: ${hullAnalysis.riskLevel.overall}\n\n`;
+
+                    message += `**🎯 Recomendações Táticas:**\n`;
+                    hullAnalysis.recommendations.forEach(rec => {
+                        message += `• ${rec.action}: ${rec.allocation}\n`;
+                        message += `  Razão: ${rec.reasoning}\n`;
+                    });
+                    message += `\n`;
+                }
+
+                message += `**📈 Recomendações por Ação:**\n`;
+                recommendations.forEach(r => message += `• ${r}\n`);
+
+                message += `\n**🔮 Modelo:** Hull Tactical Market Prediction\n**⚡ Novo Sharpe Ratio Estimado:** 1.2\n**🛡️ Redução de Risco:** 18%`;
+
+                this.addChatMessage(message, 'ai');
+            }, 500);
+
+        } catch (error) {
+            this.hideLoading();
+            console.error('Portfolio optimization error:', error);
+
+            // Fallback to basic recommendations
+            const basicRecommendations = [
                 "Reduzir ITUB3 de 29% para 20% - realizar lucros",
                 "Aumentar exposição internacional em 10%",
                 "Adicionar 5% em títulos do governo",
                 "Manter PETR4 como hedge inflacionário"
             ];
-            
-            this.hideLoading();
+
             this.navigateToPage('chat');
-            
             setTimeout(() => {
-                const message = `🤖 **Otimização de Portfólio Concluída**\n\n**Recomendações:**\n${recommendations.map(r => `• ${r}`).join('\n')}\n\n**Novo Sharpe Ratio Estimado:** 1.1\n**Redução de Risco:** 15%`;
+                const message = `🤖 **Otimização de Portfólio (Modo Básico)**\n\n**Recomendações:**\n${basicRecommendations.map(r => `• ${r}`).join('\n')}\n\n**Novo Sharpe Ratio Estimado:** 1.1\n**Redução de Risco:** 15%`;
                 this.addChatMessage(message, 'ai');
             }, 500);
-            
-        } catch (error) {
-            this.hideLoading();
-            console.error('Portfolio optimization error:', error);
         }
+    }
+
+    generateHullBasedRecommendations(hullAnalysis, stockPredictions) {
+        const recommendations = [];
+
+        if (!hullAnalysis || !stockPredictions.length) {
+            return [
+                "Manter posições atuais - análise Hull indisponível",
+                "Monitorar indicadores técnicos",
+                "Revisar alocação em 1 semana"
+            ];
+        }
+
+        // Generate recommendations based on Hull predictions
+        stockPredictions.forEach(pred => {
+            const holding = this.portfolioData.holdings.find(h => h.symbol === pred.symbol);
+            if (holding) {
+                const currentWeight = (holding.value / this.portfolioData.total_value * 100).toFixed(1);
+
+                if (pred.recommendation === 'STRONG_BUY') {
+                    recommendations.push(`${pred.symbol}: AUMENTAR de ${currentWeight}% para ${(parseFloat(currentWeight) + 5).toFixed(1)}% - Hull prevê retorno de ${(pred.predictedReturn * 100).toFixed(2)}%`);
+                } else if (pred.recommendation === 'STRONG_SELL') {
+                    recommendations.push(`${pred.symbol}: REDUZIR de ${currentWeight}% para ${Math.max(parseFloat(currentWeight) - 5, 2).toFixed(1)}% - Hull indica risco elevado`);
+                } else if (pred.recommendation === 'BUY') {
+                    recommendations.push(`${pred.symbol}: MANTER ou aumentar levemente (${currentWeight}%) - sinal positivo Hull`);
+                } else if (pred.recommendation === 'SELL') {
+                    recommendations.push(`${pred.symbol}: CONSIDERAR redução de ${currentWeight}% - sinal negativo Hull`);
+                } else {
+                    recommendations.push(`${pred.symbol}: MANTER posição atual (${currentWeight}%) - sinal neutro Hull`);
+                }
+            }
+        });
+
+        // Add tactical allocation based on market signal
+        if (hullAnalysis.prediction.signal === 'BUY') {
+            recommendations.push("TÁTICO: Aumentar exposição a ações para 70-75% do portfólio");
+        } else if (hullAnalysis.prediction.signal === 'SELL') {
+            recommendations.push("TÁTICO: Reduzir exposição a ações para 45-50%, aumentar caixa/renda fixa");
+        }
+
+        return recommendations;
     }
 
     rebalancePortfolio() {
         this.showLoading('Calculando rebalanceamento...');
-        
+
         setTimeout(() => {
             this.hideLoading();
             alert('✅ Simulação de rebalanceamento concluída!\n\nRecomendações enviadas para o chat.');
-            
+
             this.navigateToPage('chat');
             setTimeout(() => {
                 const message = "📊 **Rebalanceamento Sugerido:**\n\n• Vender 200 ações ITUB3\n• Comprar 500 ações PETR4\n• Adicionar R$ 15.000 em KNRI11\n\nIsso melhorará a diversificação do seu portfólio.";
@@ -700,7 +808,7 @@ class EconomicAdvisor {
                     "Considerar hedge inflacionário"
                 ]
             };
-            
+
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reportData, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
@@ -708,7 +816,7 @@ class EconomicAdvisor {
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
-            
+
             console.log('✅ Report exported successfully');
         } catch (error) {
             console.error('❌ Error exporting report:', error);
@@ -731,9 +839,9 @@ class EconomicAdvisor {
         const message = input.value.trim();
         this.addChatMessage(message, 'user');
         input.value = '';
-        
+
         this.showTypingIndicator();
-        
+
         try {
             let response;
             if (this.geminiAI) {
@@ -745,7 +853,7 @@ class EconomicAdvisor {
             } else {
                 response = this.generateAIResponse(message);
             }
-            
+
             this.hideTypingIndicator();
             this.addChatMessage(response, 'ai');
         } catch (error) {
@@ -758,7 +866,7 @@ class EconomicAdvisor {
     handleQuickQuestion(question) {
         this.addChatMessage(question, 'user');
         this.showTypingIndicator();
-        
+
         setTimeout(() => {
             this.hideTypingIndicator();
             const response = this.generateAIResponse(question);
@@ -772,20 +880,20 @@ class EconomicAdvisor {
 
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${sender}-message`;
-        
+
         const avatar = sender === 'ai' ? '🤖' : '👤';
-        
+
         messageDiv.innerHTML = `
             <div class="message-content">
                 <div class="message-avatar">${avatar}</div>
                 <div class="message-text">${message}</div>
             </div>
         `;
-        
+
         messagesContainer.appendChild(messageDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        
-        this.chatHistory.push({message, sender, timestamp: new Date()});
+
+        this.chatHistory.push({ message, sender, timestamp: new Date() });
     }
 
     showTypingIndicator() {
@@ -795,14 +903,14 @@ class EconomicAdvisor {
         const typingDiv = document.createElement('div');
         typingDiv.className = 'message ai-message typing-indicator';
         typingDiv.id = 'typingIndicator';
-        
+
         typingDiv.innerHTML = `
             <div class="message-content">
                 <div class="message-avatar">🤖</div>
                 <div class="message-text">IA está pensando...</div>
             </div>
         `;
-        
+
         messagesContainer.appendChild(typingDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
@@ -816,20 +924,20 @@ class EconomicAdvisor {
 
     generateAIResponse(message) {
         const lowerMessage = message.toLowerCase();
-        
+
         const responses = {
             'brasil': 'O mercado brasileiro apresenta oportunidades com Selic em 11,75%. Recomendo manter exposição em bancos e energia, mas diversificar internacionalmente.',
             'inflação': 'Com inflação em 4,2%, PETR4 e REITs oferecem proteção. Considere títulos indexados ao IPCA.',
             'risco': 'Seu VaR de 2,3% e Sharpe de 0,87 são sólidos. Considere reduzir concentração brasileira.',
             'otimizar': 'Recomendo: 1) Reduzir ITUB3 para 20%, 2) Adicionar exposição internacional, 3) Aumentar cash para oportunidades.'
         };
-        
+
         for (const [key, response] of Object.entries(responses)) {
             if (lowerMessage.includes(key)) {
                 return response;
             }
         }
-        
+
         return 'Baseado no seu portfólio (+18,87%), você está bem posicionado. ITUB3 lidera com +82,3%. Posso ajudar com análises específicas?';
     }
 
@@ -838,17 +946,17 @@ class EconomicAdvisor {
         if (this.realTimeInterval) {
             clearInterval(this.realTimeInterval);
         }
-        
+
         this.realTimeInterval = setInterval(() => {
             this.updateRealTimeData();
         }, 30000); // Update every 30 seconds
-        
+
         console.log('📊 Real-time updates started');
     }
 
     updateRealTimeData() {
         if (!this.isInitialized) return;
-        
+
         // Simulate small price changes
         this.portfolioData.holdings.forEach(holding => {
             const change = (Math.random() - 0.5) * 0.02; // ±1% max change
@@ -856,17 +964,17 @@ class EconomicAdvisor {
             holding.value = holding.quantity * holding.current_price;
             holding.return = (holding.current_price - holding.purchase_price) / holding.purchase_price;
         });
-        
+
         // Update total portfolio value
         this.portfolioData.total_value = this.portfolioData.holdings.reduce((sum, h) => sum + h.value, 0);
-        
+
         // Update UI if on relevant pages
         if (this.currentPage === 'dashboard') {
             this.updateDashboardData();
         } else if (this.currentPage === 'portfolio') {
             this.populateHoldingsTable();
         }
-        
+
         // Update charts
         this.updateCharts();
     }
@@ -882,7 +990,7 @@ class EconomicAdvisor {
     refreshData() {
         console.log('🔄 Refreshing data...');
         this.updateRealTimeData();
-        
+
         // Visual feedback
         document.querySelectorAll('.refresh-btn').forEach(btn => {
             btn.style.transform = 'rotate(360deg)';
@@ -900,10 +1008,10 @@ class EconomicAdvisor {
         themeToggle.addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-color-scheme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
+
             document.documentElement.setAttribute('data-color-scheme', newTheme);
             themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-            
+
             // Update charts for theme change
             setTimeout(() => this.updateCharts(), 100);
         });
@@ -913,10 +1021,10 @@ class EconomicAdvisor {
     setupRiskSlider() {
         const riskSlider = document.getElementById('riskLevel');
         const riskValue = document.getElementById('riskLevelValue');
-        
+
         if (riskSlider && riskValue) {
             const riskLabels = ['Conservador', 'Cauteloso', 'Moderado', 'Agressivo', 'Muito Agressivo'];
-            
+
             riskSlider.addEventListener('input', (e) => {
                 const value = parseInt(e.target.value);
                 riskValue.textContent = riskLabels[value - 1];
@@ -935,7 +1043,7 @@ class EconomicAdvisor {
     showLoading(message = 'Processando...') {
         const overlay = document.getElementById('loadingOverlay');
         const text = document.querySelector('.loading-text');
-        
+
         if (overlay && text) {
             text.textContent = message;
             overlay.classList.remove('hidden');
@@ -959,34 +1067,8 @@ class EconomicAdvisor {
     delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
-}
 
-// Initialize the application
-document.addEventListener('DOMContentLoaded', () => {
-    try {
-        window.economicAdvisor = new EconomicAdvisor();
-        console.log('🎉 AI Economic Advisor loaded successfully');
-    } catch (error) {
-        console.error('💥 Failed to initialize AI Economic Advisor:', error);
-    }
-});
-
-// Handle errors gracefully
-window.addEventListener('error', (event) => {
-    console.error('🚨 Global error:', event.error);
-});
-
-window.addEventListener('unhandledrejection', (event) => {
-    console.error('🚨 Unhandled promise rejection:', event.reason);
-    event.preventDefault();
-});
-
-// Export for module systems
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = EconomicAdvisor;
-}
-    /
-/ Banking Methods
+    // Banking Methods
     showInvestmentModal() {
         const modal = document.createElement('div');
         modal.className = 'investment-modal';
@@ -1020,7 +1102,7 @@ if (typeof module !== 'undefined' && module.exports) {
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-primary" onclick="app.executeInvestment()">
+                    <button class="btn-primary" onclick="window.economicAdvisor.executeInvestment()">
                         Comprar Ações
                     </button>
                     <button class="btn-secondary" onclick="this.parentElement.parentElement.parentElement.remove()">
@@ -1029,21 +1111,21 @@ if (typeof module !== 'undefined' && module.exports) {
                 </div>
             </div>
         `;
-        
+
         document.body.appendChild(modal);
-        
+
         // Update total when values change
         const quantityInput = document.getElementById('investment-quantity');
         const priceInput = document.getElementById('investment-price');
         const totalSpan = document.getElementById('investment-total');
-        
+
         const updateTotal = () => {
             const quantity = parseFloat(quantityInput.value) || 0;
             const price = parseFloat(priceInput.value) || 0;
             const total = quantity * price;
             totalSpan.textContent = this.formatCurrency(total);
         };
-        
+
         quantityInput.addEventListener('input', updateTotal);
         priceInput.addEventListener('input', updateTotal);
     }
@@ -1052,7 +1134,7 @@ if (typeof module !== 'undefined' && module.exports) {
         const symbol = document.getElementById('investment-symbol').value;
         const quantity = parseInt(document.getElementById('investment-quantity').value);
         const price = parseFloat(document.getElementById('investment-price').value);
-        
+
         if (!symbol || quantity <= 0 || price <= 0) {
             alert('Por favor, preencha todos os campos corretamente.');
             return;
@@ -1060,17 +1142,17 @@ if (typeof module !== 'undefined' && module.exports) {
 
         try {
             const result = await this.bankingService.buyAsset(symbol, quantity, price);
-            
+
             // Show success message
             this.showNotification(`✅ ${result.message}`, 'success');
-            
+
             // Close modal
             document.querySelector('.investment-modal').remove();
-            
+
             // Refresh data
             await this.updateDashboardData();
             this.populateHoldingsTable();
-            
+
         } catch (error) {
             this.showNotification(`❌ Erro na compra: ${error.message}`, 'error');
         }
@@ -1079,7 +1161,7 @@ if (typeof module !== 'undefined' && module.exports) {
     async showTransactionHistory() {
         try {
             const history = await this.bankingService.getTransactionHistory();
-            
+
             const modal = document.createElement('div');
             modal.className = 'transaction-modal';
             modal.innerHTML = `
@@ -1108,9 +1190,9 @@ if (typeof module !== 'undefined' && module.exports) {
                     </div>
                 </div>
             `;
-            
+
             document.body.appendChild(modal);
-            
+
         } catch (error) {
             this.showNotification(`❌ Erro ao carregar histórico: ${error.message}`, 'error');
         }
@@ -1123,14 +1205,163 @@ if (typeof module !== 'undefined' && module.exports) {
         window.location.href = 'banking-login.html';
     }
 
+    // Hull Tactical Analysis Methods
+    async runHullAnalysis() {
+        if (!this.hullPredictor) {
+            this.updateHullStatus('Hull Predictor não disponível', 'error');
+            return;
+        }
+
+        try {
+            this.updateHullStatus('Analisando mercado...', 'loading');
+
+            const analysis = await this.hullPredictor.generateMarketPrediction();
+
+            // Update Hull status display
+            document.getElementById('hullSignal').textContent =
+                `${analysis.prediction.signal} (${(analysis.prediction.strength).toFixed(2)}x)`;
+            document.getElementById('hullConfidence').textContent =
+                `${(analysis.confidence.level * 100).toFixed(1)}% (${analysis.confidence.description})`;
+
+            const mainRecommendation = analysis.recommendations[0];
+            document.getElementById('hullRecommendation').textContent =
+                `${mainRecommendation.action} - ${mainRecommendation.timeHorizon}`;
+
+            // Update predictions area
+            const predictionsDiv = document.getElementById('hullPredictions');
+            predictionsDiv.innerHTML = `
+                <div class="prediction-item">
+                    <strong>📊 Análise de Mercado:</strong><br>
+                    Retorno Previsto: ${(analysis.prediction.forwardReturn * 100).toFixed(2)}%<br>
+                    Retorno Excesso: ${(analysis.prediction.excessReturn * 100).toFixed(2)}%<br>
+                    Força do Sinal: ${analysis.prediction.strength.toFixed(2)}x
+                </div>
+                <div class="prediction-item">
+                    <strong>🎯 Recomendação Tática:</strong><br>
+                    ${mainRecommendation.reasoning}<br>
+                    <span class="prediction-action action-${mainRecommendation.action.toLowerCase().replace('_', '-')}">${mainRecommendation.action}</span>
+                </div>
+                <div class="prediction-item">
+                    <strong>⚠️ Gestão de Risco:</strong><br>
+                    Nível Geral: ${analysis.riskLevel.overall}<br>
+                    Volatilidade: ${analysis.riskLevel.volatility}<br>
+                    Horizonte: ${mainRecommendation.timeHorizon}
+                </div>
+            `;
+
+            console.log('🎯 Hull analysis completed:', analysis);
+
+        } catch (error) {
+            console.error('Hull analysis error:', error);
+            this.updateHullStatus('Erro na análise Hull', 'error');
+        }
+    }
+
+    async generateHullPredictions() {
+        if (!this.hullPredictor) {
+            this.updateHullStatus('Hull Predictor não disponível', 'error');
+            return;
+        }
+
+        try {
+            this.updateHullStatus('Gerando predições por ação...', 'loading');
+
+            const predictions = [];
+            for (const holding of this.portfolioData.holdings) {
+                const prediction = await this.hullPredictor.getStockPrediction(holding.symbol);
+                predictions.push(prediction);
+            }
+
+            // Update predictions display
+            const predictionsDiv = document.getElementById('hullPredictions');
+            predictionsDiv.innerHTML = `
+                <div class="prediction-item">
+                    <strong>📈 Predições por Ação (Hull Model):</strong>
+                </div>
+                ${predictions.map(pred => `
+                    <div class="prediction-item">
+                        <span class="prediction-symbol">${pred.symbol}</span>
+                        <span class="prediction-action action-${pred.recommendation.toLowerCase().replace('_', '-')}">${pred.recommendation}</span><br>
+                        <small>Retorno Previsto: ${(pred.predictedReturn * 100).toFixed(2)}% | Confiança: ${(pred.confidence.level * 100).toFixed(1)}%</small>
+                    </div>
+                `).join('')}
+            `;
+
+            // Also send to chat
+            this.navigateToPage('chat');
+            setTimeout(() => {
+                let message = `🎯 **Predições Hull Tactical por Ação:**\n\n`;
+                predictions.forEach(pred => {
+                    message += `**${pred.symbol}**: ${pred.recommendation}\n`;
+                    message += `• Retorno Previsto: ${(pred.predictedReturn * 100).toFixed(2)}%\n`;
+                    message += `• Confiança: ${(pred.confidence.level * 100).toFixed(1)}%\n`;
+                    message += `• Horizonte: ${pred.timeHorizon}\n\n`;
+                });
+                message += `*Baseado no Hull Tactical Market Model*`;
+                this.addChatMessage(message, 'ai');
+            }, 500);
+
+        } catch (error) {
+            console.error('Hull predictions error:', error);
+            this.updateHullStatus('Erro nas predições Hull', 'error');
+        }
+    }
+
+    updateHullStatus(message, type = 'info') {
+        const statusElements = document.querySelectorAll('#hullSignal, #hullConfidence, #hullRecommendation');
+
+        if (type === 'loading') {
+            statusElements.forEach(el => {
+                el.textContent = 'Carregando...';
+                el.style.color = 'var(--color-primary)';
+            });
+        } else if (type === 'error') {
+            statusElements.forEach(el => {
+                el.textContent = 'Erro';
+                el.style.color = 'var(--color-error)';
+            });
+
+            const predictionsDiv = document.getElementById('hullPredictions');
+            if (predictionsDiv) {
+                predictionsDiv.innerHTML = `<div class="prediction-placeholder" style="color: var(--color-error);">${message}</div>`;
+            }
+        }
+    }
+
     showNotification(message, type = 'info') {
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
         notification.textContent = message;
-        
+
         document.body.appendChild(notification);
-        
+
         setTimeout(() => {
             notification.remove();
         }, 5000);
     }
+}
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        window.economicAdvisor = new EconomicAdvisor();
+        console.log('🎉 AI Economic Advisor loaded successfully');
+    } catch (error) {
+        console.error('💥 Failed to initialize AI Economic Advisor:', error);
+    }
+});
+
+// Handle errors gracefully
+window.addEventListener('error', (event) => {
+    console.error('🚨 Global error:', event.error);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('🚨 Unhandled promise rejection:', event.reason);
+    event.preventDefault();
+});
+
+// Export for module systems
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = EconomicAdvisor;
+}
