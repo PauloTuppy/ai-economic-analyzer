@@ -1,0 +1,24 @@
+{
+  "name": "ai-economic-advisor-frontend",
+  "version": "1.0.0",
+  "description": "AI Economic Advisor - Professional Investment Platform Frontend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "serve": "node server.js"
+  },
+  "keywords": [
+    "ai",
+    "economic",
+    "advisor",
+    "investment",
+    "portfolio",
+    "finance"
+  ],
+  "author": "AI Economic Advisor Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

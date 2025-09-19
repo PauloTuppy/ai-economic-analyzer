@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Economic Advisor - Plataforma Profissional de Investimentos</title>
-    <meta name="description" content="Plataforma avançada de análise econômica e gestão de portfólio com IA">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+    <title>AI Economic Advisor - Professional Investment Platform</title>
+    <meta name="description" content="Advanced AI-powered economic analysis and portfolio management platform">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
     <meta name="theme-color" content="#1FB8CD">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -17,6 +19,7 @@
     <script src="i18n.js"></script>
     <script src="language-switcher.js"></script>
 </head>
+
 <body>
     <!-- Navigation Header -->
     <header class="header">
@@ -26,17 +29,17 @@
             </div>
             <nav class="nav-menu">
                 <button class="nav-item active" data-page="dashboard">Dashboard</button>
-                <button class="nav-item" data-page="portfolio">Portfólio</button>
-                <button class="nav-item" data-page="economic">Análise Econômica</button>
-                <button class="nav-item" data-page="risk">Avaliação de Risco</button>
-                <button class="nav-item" data-page="chat">Chat IA</button>
-                <button class="nav-item" data-page="settings">Configurações</button>
+                <button class="nav-item" data-page="portfolio">Portfolio</button>
+                <button class="nav-item" data-page="economic">Economic Analysis</button>
+                <button class="nav-item" data-page="risk">Risk Assessment</button>
+                <button class="nav-item" data-page="chat">AI Chat</button>
+                <button class="nav-item" data-page="settings">Settings</button>
             </nav>
             <div class="header-controls">
                 <button class="theme-toggle" id="themeToggle">🌙</button>
                 <div class="market-status">
                     <div class="status-indicator live"></div>
-                    <span>Mercado Ativo</span>
+                    <span>Live Market</span>
                 </div>
             </div>
         </div>
@@ -50,25 +53,25 @@
                 <!-- Portfolio Summary -->
                 <div class="card portfolio-summary">
                     <div class="card-header">
-                        <h3>Visão Geral do Portfólio</h3>
+                        <h3>Portfolio Overview</h3>
                         <div class="portfolio-value">
-                            <span class="value">R$ <span id="portfolioValue">300.910,60</span></span>
-                            <span class="return positive">+18,87%</span>
+                            <span class="value">$<span id="portfolioValue">300,727.30</span></span>
+                            <span class="return positive">+18.87%</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="portfolio-metrics">
                             <div class="metric">
-                                <span class="label">Índice Sharpe</span>
-                                <span class="value">0,87</span>
+                                <span class="label">Sharpe Ratio</span>
+                                <span class="value">0.87</span>
                             </div>
                             <div class="metric">
                                 <span class="label">Beta</span>
-                                <span class="value">1,15</span>
+                                <span class="value">1.15</span>
                             </div>
                             <div class="metric">
                                 <span class="label">VaR (95%)</span>
-                                <span class="value">2,3%</span>
+                                <span class="value">2.3%</span>
                             </div>
                         </div>
                         <div class="chart-container" style="position: relative; height: 200px;">
@@ -80,30 +83,30 @@
                 <!-- Economic Indicators -->
                 <div class="card economic-indicators">
                     <div class="card-header">
-                        <h3>Indicadores Econômicos Principais</h3>
+                        <h3>Key Economic Indicators</h3>
                         <div class="refresh-btn">🔄</div>
                     </div>
                     <div class="card-body">
                         <div class="indicator-grid">
                             <div class="indicator">
-                                <div class="indicator-name">Inflação Brasil</div>
-                                <div class="indicator-value">4,2%</div>
-                                <div class="indicator-change">+0,1%</div>
+                                <div class="indicator-name">Brazil Inflation</div>
+                                <div class="indicator-value">4.2%</div>
+                                <div class="indicator-change">+0.1%</div>
                             </div>
                             <div class="indicator">
-                                <div class="indicator-name">Taxa Selic</div>
-                                <div class="indicator-value">11,75%</div>
+                                <div class="indicator-name">Selic Rate</div>
+                                <div class="indicator-value">11.75%</div>
                                 <div class="indicator-change">-</div>
                             </div>
                             <div class="indicator">
                                 <div class="indicator-name">USD/BRL</div>
-                                <div class="indicator-value">5,12</div>
-                                <div class="indicator-change">-0,02</div>
+                                <div class="indicator-value">5.12</div>
+                                <div class="indicator-change">-0.02</div>
                             </div>
                             <div class="indicator">
-                                <div class="indicator-name">Preço do Petróleo</div>
-                                <div class="indicator-value">$82,50</div>
-                                <div class="indicator-change">+2,1%</div>
+                                <div class="indicator-name">Oil Price</div>
+                                <div class="indicator-value">$82.50</div>
+                                <div class="indicator-change">+2.1%</div>
                             </div>
                         </div>
                     </div>
@@ -112,22 +115,25 @@
                 <!-- AI Insights -->
                 <div class="card ai-insights">
                     <div class="card-header">
-                        <h3>Insights de IA do Mercado</h3>
-                        <div class="ai-status">🤖 Ativo</div>
+                        <h3>AI Market Insights</h3>
+                        <div class="ai-status">🤖 Active</div>
                     </div>
                     <div class="card-body">
                         <div class="insights-list">
                             <div class="insight">
                                 <div class="insight-icon">📈</div>
-                                <div class="insight-text">Setor financeiro mostra forte momentum com ITUB3 liderando em +82,3%</div>
+                                <div class="insight-text">Financial sector showing strong momentum with ITUB3 leading at
+                                    +82.3%</div>
                             </div>
                             <div class="insight">
                                 <div class="insight-icon">🛡️</div>
-                                <div class="insight-text">Exposição energética através de PETR4 oferece proteção efetiva contra inflação</div>
+                                <div class="insight-text">Energy exposure through PETR4 provides effective inflation
+                                    hedge</div>
                             </div>
                             <div class="insight">
                                 <div class="insight-icon">⚠️</div>
-                                <div class="insight-text">Considere diversificar além do mercado brasileiro para redução de risco</div>
+                                <div class="insight-text">Consider diversifying beyond Brazilian market for risk
+                                    reduction</div>
                             </div>
                         </div>
                     </div>
@@ -136,7 +142,7 @@
                 <!-- Market Data -->
                 <div class="card market-data">
                     <div class="card-header">
-                        <h3>Dados de Mercado em Tempo Real</h3>
+                        <h3>Live Market Data</h3>
                     </div>
                     <div class="card-body">
                         <div class="chart-container" style="position: relative; height: 250px;">
@@ -151,28 +157,28 @@
         <div class="page" id="portfolio">
             <div class="portfolio-container">
                 <div class="portfolio-header">
-                    <h2>Gestão de Portfólio</h2>
+                    <h2>Portfolio Management</h2>
                     <div class="portfolio-controls">
-                        <button class="btn btn--primary" id="optimizeBtn">🤖 Otimizar IA</button>
-                        <button class="btn btn--outline" id="rebalanceBtn">⚖️ Rebalancear</button>
-                        <button class="btn btn--outline" id="exportBtn">📊 Exportar Relatório</button>
+                        <button class="btn btn--primary" id="optimizeBtn">🤖 AI Optimize</button>
+                        <button class="btn btn--outline" id="rebalanceBtn">⚖️ Rebalance</button>
+                        <button class="btn btn--outline" id="exportBtn">📊 Export Report</button>
                     </div>
                 </div>
-                
+
                 <div class="portfolio-grid">
                     <!-- Holdings Table -->
                     <div class="card holdings-card">
                         <div class="card-header">
-                            <h3>Posições Atuais</h3>
+                            <h3>Current Holdings</h3>
                         </div>
                         <div class="card-body">
                             <div class="holdings-table">
                                 <div class="table-header">
-                                    <div class="col-symbol">Símbolo</div>
-                                    <div class="col-qty">Quantidade</div>
-                                    <div class="col-price">Preço</div>
-                                    <div class="col-value">Valor</div>
-                                    <div class="col-return">Retorno</div>
+                                    <div class="col-symbol">Symbol</div>
+                                    <div class="col-qty">Quantity</div>
+                                    <div class="col-price">Price</div>
+                                    <div class="col-value">Value</div>
+                                    <div class="col-return">Return</div>
                                 </div>
                                 <div class="table-body" id="holdingsTable">
                                     <!-- Holdings will be populated by JavaScript -->
@@ -184,7 +190,7 @@
                     <!-- Allocation Chart -->
                     <div class="card allocation-card">
                         <div class="card-header">
-                            <h3>Alocação de Ativos</h3>
+                            <h3>Asset Allocation</h3>
                         </div>
                         <div class="card-body">
                             <div class="chart-container" style="position: relative; height: 300px;">
@@ -199,11 +205,11 @@
         <!-- Economic Analysis Page -->
         <div class="page" id="economic">
             <div class="economic-container">
-                <h2>Análise Econômica</h2>
+                <h2>Economic Analysis</h2>
                 <div class="economic-grid">
                     <div class="card">
                         <div class="card-header">
-                            <h3>Tendências Econômicas Globais</h3>
+                            <h3>Global Economic Trends</h3>
                         </div>
                         <div class="card-body">
                             <div class="chart-container" style="position: relative; height: 300px;">
@@ -211,22 +217,22 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="card">
                         <div class="card-header">
-                            <h3>Calendário Econômico</h3>
+                            <h3>Economic Calendar</h3>
                         </div>
                         <div class="card-body">
                             <div class="calendar-events">
                                 <div class="event">
-                                    <div class="event-date">18 Set</div>
-                                    <div class="event-title">Reunião do Federal Reserve</div>
-                                    <div class="event-impact high">Alto Impacto</div>
+                                    <div class="event-date">Sep 18</div>
+                                    <div class="event-title">Federal Reserve Meeting</div>
+                                    <div class="event-impact high">High Impact</div>
                                 </div>
                                 <div class="event">
-                                    <div class="event-date">20 Set</div>
-                                    <div class="event-title">Divulgação PIB Brasil</div>
-                                    <div class="event-impact medium">Médio Impacto</div>
+                                    <div class="event-date">Sep 20</div>
+                                    <div class="event-title">Brazil GDP Release</div>
+                                    <div class="event-impact medium">Medium Impact</div>
                                 </div>
                             </div>
                         </div>
@@ -238,28 +244,28 @@
         <!-- Risk Assessment Page -->
         <div class="page" id="risk">
             <div class="risk-container">
-                <h2>Avaliação de Risco</h2>
+                <h2>Risk Assessment</h2>
                 <div class="risk-grid">
                     <div class="card risk-metrics">
                         <div class="card-header">
-                            <h3>Métricas de Risco</h3>
+                            <h3>Risk Metrics</h3>
                         </div>
                         <div class="card-body">
                             <div class="metrics-grid">
                                 <div class="metric-card">
                                     <div class="metric-label">Value at Risk (95%)</div>
-                                    <div class="metric-value">2,3%</div>
-                                    <div class="metric-desc">Potencial de perda diária</div>
+                                    <div class="metric-value">2.3%</div>
+                                    <div class="metric-desc">Daily loss potential</div>
                                 </div>
                                 <div class="metric-card">
-                                    <div class="metric-label">Drawdown Máximo</div>
-                                    <div class="metric-value">-8,9%</div>
-                                    <div class="metric-desc">Pior performance do período</div>
+                                    <div class="metric-label">Max Drawdown</div>
+                                    <div class="metric-value">-8.9%</div>
+                                    <div class="metric-desc">Worst period performance</div>
                                 </div>
                                 <div class="metric-card">
-                                    <div class="metric-label">Índice Sortino</div>
-                                    <div class="metric-value">1,23</div>
-                                    <div class="metric-desc">Retorno ajustado ao risco negativo</div>
+                                    <div class="metric-label">Sortino Ratio</div>
+                                    <div class="metric-value">1.23</div>
+                                    <div class="metric-desc">Downside risk-adjusted return</div>
                                 </div>
                             </div>
                         </div>
@@ -267,7 +273,7 @@
 
                     <div class="card correlation-matrix">
                         <div class="card-header">
-                            <h3>Matriz de Correlação</h3>
+                            <h3>Correlation Matrix</h3>
                         </div>
                         <div class="card-body">
                             <div class="chart-container" style="position: relative; height: 300px;">
@@ -283,33 +289,38 @@
         <div class="page" id="chat">
             <div class="chat-container">
                 <div class="chat-header">
-                    <h2>🤖 Consultor de Investimentos IA</h2>
+                    <h2>🤖 AI Investment Advisor</h2>
                     <div class="ai-status-indicator">
                         <div class="status-dot"></div>
                         <span>Online</span>
                     </div>
                 </div>
-                
+
                 <div class="chat-messages" id="chatMessages">
                     <div class="message ai-message">
                         <div class="message-content">
                             <div class="message-avatar">🤖</div>
                             <div class="message-text">
-                                Olá! Sou seu Consultor Econômico IA. Posso ajudar você a analisar seu portfólio, entender as condições do mercado e fornecer recomendações de investimento. O que gostaria de saber?
+                                Hello! I'm your AI Economic Advisor. I can help you analyze your portfolio, understand
+                                market conditions, and provide investment recommendations. What would you like to know?
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="chat-input-container">
                     <div class="chat-input">
-                        <input type="text" id="chatInput" placeholder="Pergunte sobre mercados, otimização de portfólio ou tendências econômicas...">
-                        <button class="send-btn" id="sendBtn">Enviar</button>
+                        <input type="text" id="chatInput"
+                            placeholder="Ask about markets, portfolio optimization, or economic trends...">
+                        <button class="send-btn" id="sendBtn">Send</button>
                     </div>
                     <div class="quick-questions">
-                        <button class="quick-btn" data-question="Qual é a perspectiva para os mercados brasileiros?">🇧🇷 Perspectiva Brasil</button>
-                        <button class="quick-btn" data-question="Como devo me proteger contra a inflação?">🛡️ Proteção Inflação</button>
-                        <button class="quick-btn" data-question="Otimize meu portfólio para proteção contra recessão">📉 Estratégia Recessão</button>
+                        <button class="quick-btn" data-question="What's the outlook for Brazilian markets?">🇧🇷 Brazil
+                            Outlook</button>
+                        <button class="quick-btn" data-question="How should I hedge against inflation?">🛡️ Inflation
+                            Hedge</button>
+                        <button class="quick-btn" data-question="Optimize my portfolio for recession protection">📉
+                            Recession Strategy</button>
                     </div>
                 </div>
             </div>
@@ -318,27 +329,27 @@
         <!-- Settings Page -->
         <div class="page" id="settings">
             <div class="settings-container">
-                <h2>Configurações</h2>
+                <h2>Settings & Configuration</h2>
                 <div class="settings-grid">
                     <div class="card">
                         <div class="card-header">
-                            <h3>Tolerância ao Risco</h3>
+                            <h3>Risk Tolerance</h3>
                         </div>
                         <div class="card-body">
                             <div class="form-group">
-                                <label class="form-label">Horizonte de Investimento</label>
+                                <label class="form-label">Investment Horizon</label>
                                 <select class="form-control" id="investmentHorizon">
-                                    <option value="short">Curto Prazo (1-3 anos)</option>
-                                    <option value="medium" selected>Médio Prazo (3-7 anos)</option>
-                                    <option value="long">Longo Prazo (7+ anos)</option>
+                                    <option value="short">Short Term (1-3 years)</option>
+                                    <option value="medium" selected>Medium Term (3-7 years)</option>
+                                    <option value="long">Long Term (7+ years)</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Nível de Risco: <span id="riskLevelValue">Moderado</span></label>
+                                <label class="form-label">Risk Level: <span id="riskLevelValue">Moderate</span></label>
                                 <input type="range" id="riskLevel" min="1" max="5" value="3" class="risk-slider">
                                 <div class="risk-labels">
-                                    <span>Conservador</span>
-                                    <span>Agressivo</span>
+                                    <span>Conservative</span>
+                                    <span>Aggressive</span>
                                 </div>
                             </div>
                         </div>
@@ -346,22 +357,44 @@
 
                     <div class="card">
                         <div class="card-header">
-                            <h3>Notificações</h3>
+                            <h3>Notifications</h3>
                         </div>
                         <div class="card-body">
                             <div class="notification-settings">
                                 <div class="setting-item">
-                                    <label>Alertas de portfólio</label>
+                                    <label>Portfolio alerts</label>
                                     <input type="checkbox" checked>
                                 </div>
                                 <div class="setting-item">
-                                    <label>Atualizações econômicas</label>
+                                    <label>Economic updates</label>
                                     <input type="checkbox" checked>
                                 </div>
                                 <div class="setting-item">
-                                    <label>Recomendações IA</label>
+                                    <label>AI recommendations</label>
                                     <input type="checkbox" checked>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Language & Region</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label">Language</label>
+                                <select class="form-control" id="languageSelect">
+                                    <option value="en" selected>English</option>
+                                    <option value="pt">Português</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Currency Display</label>
+                                <select class="form-control" id="currencySelect">
+                                    <option value="USD" selected>USD ($)</option>
+                                    <option value="BRL">BRL (R$)</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -373,10 +406,12 @@
     <!-- Loading Overlay -->
     <div class="loading-overlay hidden" id="loadingOverlay">
         <div class="loading-spinner"></div>
-        <div class="loading-text">Processando sua solicitação...</div>
+        <div class="loading-text">Processing your request...</div>
     </div>
 
     <script src="app.js"></script>
+    <script src="app-en.js"></script>
     <script src="demo-features.js"></script>
 </body>
+
 </html>
