@@ -160,6 +160,15 @@
             text-align: center;
         }
 
+        .info-message {
+            background: var(--color-primary);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
         .loading {
             display: inline-block;
             width: 20px;
@@ -235,7 +244,7 @@
                         <div class="demo-account-balance">Saldo: R$ 50.000,00</div>
                     </div>
                     <button class="demo-login-btn" onclick="quickLogin('admin', 'admin123')">
-                        Login
+                        Preencher
                     </button>
                 </div>
 
@@ -245,7 +254,7 @@
                         <div class="demo-account-balance">Saldo: R$ 25.000,00</div>
                     </div>
                     <button class="demo-login-btn" onclick="quickLogin('investor', 'investor123')">
-                        Login
+                        Preencher
                     </button>
                 </div>
 
@@ -255,7 +264,7 @@
                         <div class="demo-account-balance">Saldo: R$ 15.000,00</div>
                     </div>
                     <button class="demo-login-btn" onclick="quickLogin('trader', 'trader123')">
-                        Login
+                        Preencher
                     </button>
                 </div>
             </div>
@@ -327,16 +336,27 @@
             }
 
             async quickLogin(username, password) {
+                // Only fill the form fields, don't auto-submit
                 document.getElementById('username').value = username;
                 document.getElementById('password').value = password;
                 
-                const form = document.getElementById('login-form');
-                form.dispatchEvent(new Event('submit'));
+                // Focus on the login button to indicate user should click it
+                const loginBtn = document.getElementById('login-btn');
+                loginBtn.focus();
+                
+                // Show a message indicating the fields are filled
+                this.showMessage('✏️ Campos preenchidos! Clique em "Entrar" para fazer login.', 'info');
             }
 
             showMessage(message, type) {
                 const container = document.getElementById('message-container');
-                const className = type === 'error' ? 'error-message' : 'success-message';
+                let className = 'success-message';
+                
+                if (type === 'error') {
+                    className = 'error-message';
+                } else if (type === 'info') {
+                    className = 'info-message';
+                }
                 
                 container.innerHTML = `<div class="${className}">${message}</div>`;
                 
