@@ -259,9 +259,55 @@ this.apiKey = 'SUA_API_KEY_AQUI';
 
 **O AI Economic Advisor é agora uma plataforma de investimentos totalmente funcional e profissional com capacidades reais de IA, predições de mercado, ferramentas abrangentes de gestão de portfólio E sistema bancário completo estilo Bank of Anthos!** 🎉🏦
 
+## 🚀 **Deploy e Infraestrutura**
+
+### **🐳 Docker Compose (Desenvolvimento)**
+```bash
+# Deploy completo com um comando
+docker-compose up -d
+
+# Acesse: http://localhost:3002
+```
+
+### **☸️ Kubernetes (Produção)**
+```bash
+# Deploy no Google Cloud / AWS / Azure
+cd kubernetes
+chmod +x deploy.sh
+./deploy.sh deploy
+
+# Ou deploy manual
+kubectl apply -f kubernetes/
+```
+
+### **🔄 CI/CD Pipeline**
+- **GitHub Actions**: Build, test e deploy automático
+- **Multi-environment**: Staging e Production
+- **Security Scanning**: Trivy vulnerability scanner
+- **Load Testing**: Locust performance testing
+- **Health Checks**: Monitoramento automático
+
+### **📊 Monitoramento**
+- **Prometheus**: Métricas de performance
+- **Grafana**: Dashboards visuais
+- **Alertmanager**: Alertas automáticos
+- **Health Endpoints**: `/health` em todos os serviços
+
+### **🧪 Testes de Carga**
+```bash
+# Instalar Locust
+pip install locust
+
+# Executar testes
+cd load-testing
+locust -f locustfile.py --host=http://localhost:3002
+```
+
 ## 📞 Suporte e Contribuição
 
 - **Issues**: Reporte bugs ou solicite funcionalidades
 - **Pull Requests**: Contribuições são bem-vindas
 - **Documentação**: Veja `frontend/FEATURES.md` para lista completa de funcionalidades
+- **Banking Services**: Veja `banking-services/README.md` para detalhes técnicos
+- **Kubernetes**: Veja `kubernetes/` para manifests de deploy
 - **Licença**: MIT License

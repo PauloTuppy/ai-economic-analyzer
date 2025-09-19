@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ai-economic-advisor
+  labels:
+    app: ai-economic-advisor
+    version: v1.0.0

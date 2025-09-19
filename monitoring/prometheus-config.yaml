@@ -1,0 +1,122 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: ai-economic-advisor
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    rule_files:
+      - "alert_rules.yml"
+
+    scrape_configs:
+      # AI Economic Advisor Services
+      - job_name: 'userservice'
+        static_configs:
+          - targets: ['userservice:5001']
+        metrics_path: '/metrics'
+        scrape_interval: 10s
+
+      - job_name: 'balanceservice'
+        static_configs:
+          - targets: ['balanceservice:5002']
+        metrics_path: '/metrics'
+        scrape_interval: 10s
+
+      - job_name: 'transactionservice'
+        static_configs:
+          - targets: ['transactionservice:5003']
+        metrics_path: '/metrics'
+        scrape_interval: 10s
+
+      - job_name: 'frontend'
+        static_configs:
+          - targets: ['frontend:3002']
+        metrics_path: '/metrics'
+        scrape_interval: 30s
+
+      # Kubernetes cluster monitoring
+      - job_name: 'kubernetes-apiservers'
+        kubernetes_sd_configs:
+        - role: endpoints
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+          action: keep
+          regex: default;kubernetes;https
+
+      - job_name: 'kubernetes-nodes'
+        kubernetes_sd_configs:
+        - role: node
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+              - alertmanager:9093
+
+  alert_rules.yml: |
+    groups:
+    - name: ai-economic-advisor
+      rules:
+      # Service availability alerts
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} has been down for more than 1 minute."
+
+      # High error rate alerts
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate on {{ $labels.job }}"
+          description: "Error rate is {{ $value }} errors per second."
+
+      # High response time alerts
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High response time on {{ $labels.job }}"
+          description: "95th percentile response time is {{ $value }} seconds."
+
+      # Banking specific alerts
+      - alert: HighTransactionVolume
+        expr: rate(banking_transactions_total[5m]) > 100
+        for: 2m
+        labels:
+          severity: info
+        annotations:
+          summary: "High transaction volume detected"
+          description: "Transaction rate is {{ $value }} per second."
+
+      - alert: LowAccountBalance
+        expr: banking_account_balance < 1000
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low account balance detected"
+          description: "Account {{ $labels.account_number }} has balance of {{ $value }}."

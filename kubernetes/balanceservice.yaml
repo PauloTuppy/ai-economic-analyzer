@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: balanceservice
+  namespace: ai-economic-advisor
+  labels:
+    app: balanceservice
+    version: v1.0.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: balanceservice
+  template:
+    metadata:
+      labels:
+        app: balanceservice
+        version: v1.0.0
+    spec:
+      containers:
+      - name: balanceservice
+        image: ai-economic-advisor/balanceservice:latest
+        ports:
+        - containerPort: 5002
+        env:
+        - name: FLASK_ENV
+          value: "production"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: secret
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5002
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: balance-data
+          mountPath: /app/data
+      volumes:
+      - name: balance-data
+        persistentVolumeClaim:
+          claimName: balance-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: balanceservice
+  namespace: ai-economic-advisor
+  labels:
+    app: balanceservice
+spec:
+  selector:
+    app: balanceservice
+  ports:
+  - port: 5002
+    targetPort: 5002
+    protocol: TCP
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: balance-data-pvc
+  namespace: ai-economic-advisor
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi

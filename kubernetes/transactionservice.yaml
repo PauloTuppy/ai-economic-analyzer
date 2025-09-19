@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transactionservice
+  namespace: ai-economic-advisor
+  labels:
+    app: transactionservice
+    version: v1.0.0
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: transactionservice
+  template:
+    metadata:
+      labels:
+        app: transactionservice
+        version: v1.0.0
+    spec:
+      containers:
+      - name: transactionservice
+        image: ai-economic-advisor/transactionservice:latest
+        ports:
+        - containerPort: 5003
+        env:
+        - name: FLASK_ENV
+          value: "production"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: secret
+        - name: BALANCE_SERVICE_URL
+          value: "http://balanceservice:5002"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "400m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5003
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5003
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: transaction-data
+          mountPath: /app/data
+      volumes:
+      - name: transaction-data
+        persistentVolumeClaim:
+          claimName: transaction-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transactionservice
+  namespace: ai-economic-advisor
+  labels:
+    app: transactionservice
+spec:
+  selector:
+    app: transactionservice
+  ports:
+  - port: 5003
+    targetPort: 5003
+    protocol: TCP
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: transaction-data-pvc
+  namespace: ai-economic-advisor
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi

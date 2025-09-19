@@ -1,0 +1,153 @@
+version: '3.8'
+
+services:
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+    depends_on:
+      - userservice
+      - balanceservice
+      - transactionservice
+      - backend
+    networks:
+      - ai-economic-network
+
+  # Backend Service (Economic Data)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
+    volumes:
+      - ./backend:/app
+    networks:
+      - ai-economic-network
+
+  # Banking Services (Bank of Anthos Style)
+  userservice:
+    build:
+      context: ./banking-services/userservice
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - FLASK_ENV=production
+      - JWT_SECRET=ai-economic-advisor-production-secret
+    volumes:
+      - user_data:/app/data
+    networks:
+      - ai-economic-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  balanceservice:
+    build:
+      context: ./banking-services/balanceservice
+      dockerfile: Dockerfile
+    ports:
+      - "5002:5002"
+    environment:
+      - FLASK_ENV=production
+      - JWT_SECRET=ai-economic-advisor-production-secret
+    volumes:
+      - balance_data:/app/data
+    depends_on:
+      - userservice
+    networks:
+      - ai-economic-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  transactionservice:
+    build:
+      context: ./banking-services/transactionservice
+      dockerfile: Dockerfile
+    ports:
+      - "5003:5003"
+    environment:
+      - FLASK_ENV=production
+      - JWT_SECRET=ai-economic-advisor-production-secret
+      - BALANCE_SERVICE_URL=http://balanceservice:5002
+    volumes:
+      - transaction_data:/app/data
+    depends_on:
+      - userservice
+      - balanceservice
+    networks:
+      - ai-economic-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis for Session Management (Future Enhancement)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ai-economic-network
+    command: redis-server --appendonly yes
+
+  # PostgreSQL for Production Database (Future Enhancement)
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=ai_economic_advisor
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./banking-services/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - ai-economic-network
+
+  # Nginx Load Balancer (Future Enhancement)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - frontend
+      - userservice
+      - balanceservice
+      - transactionservice
+    networks:
+      - ai-economic-network
+
+volumes:
+  user_data:
+  balance_data:
+  transaction_data:
+  redis_data:
+  postgres_data:
+
+networks:
+  ai-economic-network:
+    driver: bridge
